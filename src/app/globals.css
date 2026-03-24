@@ -1000,6 +1000,20 @@ h1, h2, h3, h4 {
     flex-direction: column;
     position: fixed;
     height: 100vh;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.admin-sidebar-close {
+    display: none;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #888;
+    cursor: pointer;
 }
 
 .admin-sidebar-header {
@@ -1065,6 +1079,28 @@ h1, h2, h3, h4 {
     font-size: 1.8rem;
     margin-bottom: 1.5rem;
     color: #333;
+}
+
+.admin-mobile-header {
+    display: none;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.admin-menu-toggle {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #333;
+    cursor: pointer;
+}
+
+.admin-mobile-header h1 {
+    margin: 0;
+    font-size: 1.4rem;
 }
 
 .admin-stats-grid {
@@ -1552,7 +1588,8 @@ h1, h2, h3, h4 {
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .admin-table {
@@ -1621,11 +1658,27 @@ h1, h2, h3, h4 {
         flex-direction: column;
     }
     .admin-sidebar {
-        width: 100%;
-        position: relative;
-        height: auto;
+        width: 280px;
+        transform: translateX(-100%);
+    }
+    .admin-layout.sidebar-open .admin-sidebar {
+        transform: translateX(0);
+        box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+    }
+    .admin-sidebar-close {
+        display: block;
     }
     .admin-main {
         margin-left: 0;
+        padding: 1rem;
+    }
+    .admin-main > h1 {
+        display: none;
+    }
+    .admin-mobile-header {
+        display: flex;
+    }
+    .admin-table {
+        min-width: 800px;
     }
 }

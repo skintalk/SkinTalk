@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsers, faShoppingBag, faDollarSign, faBox, faChartLine, faSignOutAlt, faPlus, faTrash, faImage, faCreditCard } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faShoppingBag, faDollarSign, faBox, faChartLine, faSignOutAlt, faPlus, faTrash, faImage, faCreditCard, faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { motion } from 'framer-motion';
 import { getSupabase, isAdminEmail, getAdminClient } from '@/lib/supabase';
 
@@ -63,6 +63,7 @@ export default function AdminPage() {
     const [showAddCategory, setShowAddCategory] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     useEffect(() => {
         checkAuth();
@@ -347,27 +348,34 @@ export default function AdminPage() {
     if (!isAdmin) return null;
 
     return (
-        <div className="admin-layout">
+        <div className={`admin-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
             <aside className="admin-sidebar">
+                <button className="admin-sidebar-close" onClick={() => setIsSidebarOpen(false)}>
+                    <FontAwesomeIcon icon={faTimes} />
+                </button>
+
                 <div className="admin-sidebar-header">
                     <h2>SkinTalk Admin</h2>
                     <p>Merchant Dashboard</p>
                 </div>
                 <nav className="admin-nav">
-                    <button className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
+                    <button className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }}>
                         <FontAwesomeIcon icon={faChartLine} /> Dashboard
                     </button>
-                    <button className={`admin-nav-item ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
+                    <button className={`admin-nav-item ${activeTab === 'products' ? 'active' : ''}`} onClick={() => { setActiveTab('products'); setIsSidebarOpen(false); }}>
                         <FontAwesomeIcon icon={faBox} /> Products
                     </button>
-                    <button className={`admin-nav-item ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
+                    <button className={`admin-nav-item ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => { setActiveTab('orders'); setIsSidebarOpen(false); }}>
                         <FontAwesomeIcon icon={faShoppingBag} /> Orders
                     </button>
-                    <button className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
+                    <button className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`} onClick={() => { setActiveTab('users'); setIsSidebarOpen(false); }}>
                         <FontAwesomeIcon icon={faUsers} /> Users
                     </button>
-                    <button className={`admin-nav-item ${activeTab === 'payment' ? 'active' : ''}`} onClick={() => setActiveTab('payment')}>
+                    <button className={`admin-nav-item ${activeTab === 'payment' ? 'active' : ''}`} onClick={() => { setActiveTab('payment'); setIsSidebarOpen(false); }}>
                         <FontAwesomeIcon icon={faCreditCard} /> Payment Setup
+                    </button>
+                    <button className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }} style={{ display: 'none' }}>
+                        Dashboard
                     </button>
                 </nav>
                 <div className="admin-sidebar-footer">
@@ -378,6 +386,13 @@ export default function AdminPage() {
             </aside>
 
             <main className="admin-main">
+                <header className="admin-mobile-header">
+                    <button className="admin-menu-toggle" onClick={() => setIsSidebarOpen(true)}>
+                        <FontAwesomeIcon icon={faBars} />
+                    </button>
+                    <h1>SkinTalk Admin</h1>
+                </header>
+
                 {activeTab === 'dashboard' && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                         <h1>Dashboard Overview</h1>
