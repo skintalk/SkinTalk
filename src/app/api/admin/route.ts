@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
         const { action, data, userEmail } = body;
 
         const isAdmin = userEmail && userEmail.toLowerCase() === adminEmail;
-        const adminActions = ['add_product', 'update_product', 'delete_product', 'update_order_status', 'add_category'];
+        const adminActions = ['add_product', 'update_product', 'delete_product', 'update_order_status', 'add_category', 'select_merchant'];
 
         if (adminActions.includes(action) && !isAdmin) {
             return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
@@ -152,6 +152,27 @@ export async function POST(request: NextRequest) {
                 
                 if (error) return NextResponse.json({ error: error.message }, { status: 500 });
                 return NextResponse.json({ success: true, data: merchant });
+            }
+
+            case 'select_merchant': {
+                const { id } = data;
+                // Deselect all
+                const { error: deselectError } = await adminClient
+                    .from('merchant_data')
+                    .update({ selected: false })
+                    .neq('id', '00000000-0000-0000-0000-000000000000');
+
+                if (deselectError) return NextResponse.json({ error: deselectError.message }, { status: 500 });
+
+                // Select the new one
+                const { error: selectError } = await adminClient
+                    .from('merchant_data')
+                    .update({ selected: true })
+                    .eq('id', id);
+
+                if (selectError) return NextResponse.json({ error: selectError.message }, { status: 500 });
+
+                return NextResponse.json({ success: true });
             }
 
             default:

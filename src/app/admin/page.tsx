@@ -114,6 +114,7 @@ export default function AdminPage() {
     const [qrLoading, setQrLoading] = useState(false);
     const [qrError, setQrError] = useState('');
     const [qrResult, setQrResult] = useState<any>(null);
+    const [savedMerchants, setSavedMerchants] = useState<any[]>([]);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     useEffect(() => {
@@ -125,6 +126,18 @@ export default function AdminPage() {
             loadData();
         }
     }, [isAdmin]);
+
+    useEffect(() => {
+        if (activeTab === 'payment') {
+            loadSavedMerchant();
+        }
+    }, [activeTab]);
+
+    const loadSavedMerchant = async () => {
+        const supabase = getSupabase();
+        const { data } = await supabase.from('merchant_data').select('*').order('created_at', { ascending: false });
+        if (data) setSavedMerchants(data);
+    };
 
     const checkAuth = async () => {
         const supabase = getSupabase();
@@ -711,7 +724,7 @@ export default function AdminPage() {
 
                 {activeTab === 'payment' && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                        <h1>QR Payment Verification</h1>
+                        <h1>My QRs</h1>
                         <div className="admin-card">
                             <h3>Scan or Upload QR Code</h3>
                             <p style={{ color: '#666', marginBottom: '1rem' }}>Upload a QR code image to verify payment details</p>
@@ -799,6 +812,8 @@ export default function AdminPage() {
                                                     const result = await response.json();
                                                     if (result.success) {
                                                         alert('Merchant data saved successfully!');
+                                                        setQrResult(null);
+                                                        loadSavedMerchant();
                                                     } else {
                                                         alert('Error saving merchant: ' + result.error);
                                                     }
@@ -822,6 +837,73 @@ export default function AdminPage() {
                                 </div>
                             )}
                         </div>
+
+                        {savedMerchants.length > 0 && (
+                            <div style={{ marginTop: '1.5rem' }}>
+                                <h3>Saved Merchants</h3>
+                                <div style={{ 
+                                    display: 'grid', 
+                                    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
+                                    gap: '1.25rem',
+                                    marginTop: '1rem'
+                                }}>
+                                    {savedMerchants.map((merchant) => (
+                                        <div 
+                                            key={merchant.id} 
+                                            className="admin-card" 
+                                            style={{ 
+                                                padding: '1.5rem', 
+                                                cursor: 'pointer',
+                                                border: merchant.selected ? '2px solid var(--accent)' : '2px solid transparent',
+                                                transition: 'all 0.2s ease',
+                                                boxShadow: merchant.selected ? '0 4px 12px rgba(0,0,0,0.1)' : '0 2px 4px rgba(0,0,0,0.05)'
+                                            }}
+                                            onClick={async () => {
+                                                try {
+                                                    const response = await fetch('/api/admin', {
+                                                        method: 'POST',
+                                                        headers: { 'Content-Type': 'application/json' },
+                                                        body: JSON.stringify({
+                                                            action: 'select_merchant',
+                                                            data: { id: merchant.id },
+                                                            userEmail: user?.email
+                                                        })
+                                                    });
+                                                    const result = await response.json();
+                                                    if (result.success) {
+                                                        loadSavedMerchant();
+                                                    } else {
+                                                        alert('Error selecting merchant: ' + result.error);
+                                                    }
+                                                } catch (err) {
+                                                    alert('Error selecting merchant');
+                                                }
+                                            }}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                                                <input 
+                                                    type="radio" 
+                                                    checked={merchant.selected || false} 
+                                                    onChange={() => {}}
+                                                    style={{ accentColor: 'var(--accent)', width: '20px', height: '20px' }}
+                                                />
+                                                <strong style={{ fontSize: '1.1rem', color: '#333' }}>
+                                                    {bankCodeItems[merchant.bank_code] || merchant.bank_code || 'N/A'}
+                                                </strong>
+                                            </div>
+                                            <div style={{ color: '#666', marginLeft: '2rem', fontSize: '0.95rem' }}>
+                                                <div style={{ fontWeight: 500, color: 'var(--accent)', marginBottom: '0.25rem' }}>
+                                                    {merchant.merchant_name || 'N/A'}
+                                                </div>
+                                                <div style={{ opacity: 0.8 }}>
+                                                    {merchant.merchant_city || 'N/A'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </motion.div>
                 )}
             </main>
