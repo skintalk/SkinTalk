@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsers, faShoppingBag, faDollarSign, faBox, faChartLine, faSignOutAlt, faPlus, faTrash, faImage } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faShoppingBag, faDollarSign, faBox, faChartLine, faSignOutAlt, faPlus, faTrash, faImage, faCreditCard } from '@fortawesome/free-solid-svg-icons';
 import { motion } from 'framer-motion';
 import { getSupabase, isAdminEmail, getAdminClient } from '@/lib/supabase';
 
@@ -45,7 +45,7 @@ export default function AdminPage() {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'orders' | 'users'>('dashboard');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'orders' | 'users' | 'payment'>('dashboard');
     const [products, setProducts] = useState<Product[]>([]);
     const [orders, setOrders] = useState<Order[]>([]);
     const [users, setUsers] = useState<UserProfile[]>([]);
@@ -366,6 +366,9 @@ export default function AdminPage() {
                     <button className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
                         <FontAwesomeIcon icon={faUsers} /> Users
                     </button>
+                    <button className={`admin-nav-item ${activeTab === 'payment' ? 'active' : ''}`} onClick={() => setActiveTab('payment')}>
+                        <FontAwesomeIcon icon={faCreditCard} /> Payment Setup
+                    </button>
                 </nav>
                 <div className="admin-sidebar-footer">
                     <button className="admin-nav-item" onClick={handleLogout}>
@@ -614,6 +617,17 @@ export default function AdminPage() {
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+                    </motion.div>
+                )}
+
+                {activeTab === 'payment' && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <h1>Payment Setup</h1>
+                        <div className="admin-card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
+                            <FontAwesomeIcon icon={faCreditCard} style={{ fontSize: '3rem', color: '#ccc', marginBottom: '1rem' }} />
+                            <h3 style={{ color: '#666', marginBottom: '0.5rem' }}>Payment Setup</h3>
+                            <p style={{ color: '#999' }}>Payment setup will be available soon.</p>
                         </div>
                     </motion.div>
                 )}
