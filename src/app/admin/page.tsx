@@ -1,0 +1,623 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUsers, faShoppingBag, faDollarSign, faBox, faChartLine, faSignOutAlt, faPlus, faTrash, faImage } from '@fortawesome/free-solid-svg-icons';
+import { motion } from 'framer-motion';
+import { getSupabase, isAdminEmail, getAdminClient } from '@/lib/supabase';
+
+interface Category {
+    id: string;
+    name: string;
+}
+
+interface Product {
+    id: string;
+    name: string;
+    price: number;
+    image: string;
+    category: string;
+    quantity: number;
+    created_at: string;
+}
+
+interface Order {
+    id: string;
+    user_id: string;
+    items: { product_id: string }[];
+    total: number;
+    status: string;
+    created_at: string;
+    items_detail?: { name: string; price: number; image: string }[];
+    customer_email?: string;
+}
+
+interface UserProfile {
+    id: string;
+    email: string;
+    created_at: string;
+    total_spent?: number;
+}
+
+export default function AdminPage() {
+    const router = useRouter();
+    const [user, setUser] = useState<UserProfile | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'orders' | 'users'>('dashboard');
+    const [products, setProducts] = useState<Product[]>([]);
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [users, setUsers] = useState<UserProfile[]>([]);
+    const [stats, setStats] = useState({ totalRevenue: 0, totalOrders: 0, totalUsers: 0, totalProducts: 0 });
+    
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [newProductName, setNewProductName] = useState('');
+    const [newProductPrice, setNewProductPrice] = useState('');
+    const [newProductQuantity, setNewProductQuantity] = useState('');
+    const [newProductCategory, setNewProductCategory] = useState('General');
+    const [newProductImage, setNewProductImage] = useState<File | null>(null);
+    const [newProductImageName, setNewProductImageName] = useState('');
+    const [uploading, setUploading] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState('');
+    const [showAddCategory, setShowAddCategory] = useState(false);
+    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+
+    useEffect(() => {
+        checkAuth();
+    }, []);
+
+    useEffect(() => {
+        if (isAdmin) {
+            loadData();
+        }
+    }, [isAdmin]);
+
+    const checkAuth = async () => {
+        const supabase = getSupabase();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            setUser({ id: user.id, email: user.email || '', created_at: '' });
+            if (isAdminEmail(user.email)) {
+                setIsAdmin(true);
+            } else {
+                router.push('/');
+            }
+        } else {
+            router.push('/');
+        }
+        setLoading(false);
+    };
+
+    const loadData = async () => {
+        const supabase = getSupabase();
+
+        const [productsRes, usersRes, categoriesRes] = await Promise.all([
+            supabase.from('products').select('*').order('created_at', { ascending: false }),
+            supabase.from('user_profiles').select('*').order('created_at', { ascending: false }),
+            supabase.from('categories').select('*').order('name', { ascending: true })
+        ]);
+
+        let ordersRes: any = { data: [] };
+        if (user) {
+            const ordersApiRes = await fetch('/api/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'get_orders', userEmail: user.email })
+            });
+            ordersRes = await ordersApiRes.json();
+        }
+
+        console.log('productsRes:', productsRes.data?.length);
+        console.log('ordersRes:', ordersRes);
+        console.log('ordersRes.error:', ordersRes.error);
+
+        if (productsRes.data) setProducts(productsRes.data);
+        if (ordersRes.data && ordersRes.data.length > 0) {
+            const ordersWithDetails = ordersRes.data.map((order: any) => {
+                let itemsDetail: any[] = [];
+                if (order.items && Array.isArray(order.items)) {
+                    itemsDetail = order.items.map((item: any) => {
+                        if (item.product_id) {
+                            const product = productsRes.data?.find(p => p.id === item.product_id);
+                            return product ? { name: product.name, price: product.price, image: product.image } : null;
+                        } else if (item.name) {
+                            return { name: item.name, price: item.price, image: item.image };
+                        }
+                        return null;
+                    }).filter(Boolean);
+                }
+                const customer = usersRes.data?.find(u => u.id === order.user_id);
+                return { ...order, items_detail: itemsDetail, customer_email: customer?.email || 'Unknown' };
+            });
+            console.log('ordersWithDetails:', ordersWithDetails);
+            setOrders(ordersWithDetails);
+        }
+        if (categoriesRes.data) setCategories(categoriesRes.data);
+        
+        if (usersRes.data && ordersRes.data) {
+            const usersWithSpent = usersRes.data.map((u: any) => {
+                const userOrders = ordersRes.data?.filter((o: any) => o.user_id === u.id) || [];
+                const totalSpent = userOrders.reduce((sum: number, o: any) => {
+                    if (o.status !== 'cancelled' && o.status !== 'Cancelled') {
+                        return sum + (o.total || 0);
+                    }
+                    return sum;
+                }, 0);
+                return { ...u, total_spent: totalSpent };
+            });
+            console.log('usersWithSpent:', usersWithSpent);
+            setUsers(usersWithSpent);
+        }
+
+        const totalRevenue = ordersRes.data?.reduce((sum: number, o: any) => {
+            if (o.status !== 'cancelled' && o.status !== 'Cancelled') {
+                return sum + o.total;
+            }
+            return sum;
+        }, 0) || 0;
+        setStats({
+            totalRevenue,
+            totalOrders: ordersRes.data?.length || 0,
+            totalUsers: usersRes.data?.length || 0,
+            totalProducts: productsRes.data?.length || 0
+        });
+    };
+
+    const handleLogout = async () => {
+        const supabase = getSupabase();
+        await supabase.auth.signOut();
+        router.push('/');
+    };
+
+    const handleAddCategory = async () => {
+        if (!newCategoryName.trim()) {
+            return;
+        }
+        if (!user) return;
+        
+        const res = await fetch('/api/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'add_category',
+                data: { name: newCategoryName.trim() },
+                userEmail: user.email
+            })
+        });
+        const json = await res.json();
+        
+        if (json.error) {
+            if (json.error.includes('duplicate')) {
+                alert('Category already exists');
+            } else {
+                alert('Error adding category: ' + json.error);
+            }
+        } else {
+            setNewCategoryName('');
+            setShowAddCategory(false);
+            loadData();
+            if (json.data) setNewProductCategory(json.data.name);
+        }
+    };
+
+    const handleSaveProduct = async () => {
+        if (!newProductName || !newProductPrice || !newProductQuantity) {
+            alert('Please enter product name, price and quantity');
+            return;
+        }
+        if (!user) {
+            alert('Please login first');
+            return;
+        }
+
+        setUploading(true);
+        let imageUrl = editingProduct?.image || '/WhatsApp Image 2026-03-23 at 9.10.39 AM.jpeg';
+        const oldImage = editingProduct?.image;
+
+        const saveProduct = async (imgUrl: string) => {
+            const action = editingProduct ? 'update_product' : 'add_product';
+            const data: any = {
+                name: newProductName,
+                price: parseFloat(newProductPrice),
+                quantity: parseInt(newProductQuantity) || 0,
+                image: imgUrl,
+                category: newProductCategory
+            };
+            if (editingProduct) {
+                data.id = editingProduct.id;
+                data.oldImage = oldImage;
+            }
+
+            const res = await fetch('/api/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, data, userEmail: user.email })
+            });
+            const json = await res.json();
+            
+            if (json.error) {
+                alert(`Error ${editingProduct ? 'updating' : 'adding'} product: ` + json.error);
+            } else {
+                resetForm();
+                loadData();
+                alert(editingProduct ? 'Product updated!' : 'Product added!');
+            }
+            setUploading(false);
+        };
+
+        if (newProductImage) {
+            const fileExt = newProductImage.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+            
+            const reader = new FileReader();
+            reader.readAsDataURL(newProductImage);
+            reader.onload = async () => {
+                const base64 = (reader.result as string).split(',')[1];
+                
+                const uploadRes = await fetch('/api/admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'upload_image',
+                        data: { imageData: base64, fileName },
+                        userEmail: user.email
+                    })
+                });
+                const uploadJson = await uploadRes.json();
+                
+                if (uploadJson.error) {
+                    alert('Error uploading image: ' + uploadJson.error);
+                    setUploading(false);
+                    return;
+                }
+                
+                saveProduct(uploadJson.url);
+            };
+        } else {
+            saveProduct(imageUrl);
+        }
+    };
+
+    const resetForm = () => {
+        setNewProductName('');
+        setNewProductPrice('');
+        setNewProductQuantity('');
+        setNewProductCategory('General');
+        setNewProductImage(null);
+        setNewProductImageName('');
+        setEditingProduct(null);
+        setIsCategoryDropdownOpen(false);
+    };
+
+    const handleEditProduct = (product: Product) => {
+        setEditingProduct(product);
+        setNewProductName(product.name);
+        setNewProductPrice(product.price.toString());
+        setNewProductQuantity(product.quantity?.toString() || '0');
+        setNewProductCategory(product.category || 'General');
+        setNewProductImage(null);
+        setNewProductImageName('');
+        setIsCategoryDropdownOpen(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleDeleteProduct = async (productId: string) => {
+        if (!confirm('Are you sure you want to delete this product?')) return;
+        if (!user) return;
+        
+        const res = await fetch('/api/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'delete_product',
+                data: { id: productId },
+                userEmail: user.email
+            })
+        });
+        const json = await res.json();
+        
+        if (json.error) {
+            alert('Error: ' + json.error);
+        } else {
+            loadData();
+            alert('Product deleted!');
+        }
+    };
+
+    const handleStatusChange = async (orderId: string, status: string) => {
+        if (!user) return;
+        
+        const res = await fetch('/api/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'update_order_status',
+                data: { id: orderId, status },
+                userEmail: user.email
+            })
+        });
+        const json = await res.json();
+        
+        if (!json.error) loadData();
+    };
+
+    if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;
+    if (!isAdmin) return null;
+
+    return (
+        <div className="admin-layout">
+            <aside className="admin-sidebar">
+                <div className="admin-sidebar-header">
+                    <h2>SkinTalk Admin</h2>
+                    <p>Merchant Dashboard</p>
+                </div>
+                <nav className="admin-nav">
+                    <button className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
+                        <FontAwesomeIcon icon={faChartLine} /> Dashboard
+                    </button>
+                    <button className={`admin-nav-item ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
+                        <FontAwesomeIcon icon={faBox} /> Products
+                    </button>
+                    <button className={`admin-nav-item ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
+                        <FontAwesomeIcon icon={faShoppingBag} /> Orders
+                    </button>
+                    <button className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
+                        <FontAwesomeIcon icon={faUsers} /> Users
+                    </button>
+                </nav>
+                <div className="admin-sidebar-footer">
+                    <button className="admin-nav-item" onClick={handleLogout}>
+                        <FontAwesomeIcon icon={faSignOutAlt} /> Logout
+                    </button>
+                </div>
+            </aside>
+
+            <main className="admin-main">
+                {activeTab === 'dashboard' && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <h1>Dashboard Overview</h1>
+                        <div className="admin-stats-grid">
+                            <div className="admin-stat-card">
+                                <div className="stat-icon"><FontAwesomeIcon icon={faDollarSign} /></div>
+                                <div className="stat-content">
+                                    <h3>Total Revenue</h3>
+                                    <p className="stat-value">LKR {stats.totalRevenue.toFixed(2)}</p>
+                                </div>
+                            </div>
+                            <div className="admin-stat-card">
+                                <div className="stat-icon"><FontAwesomeIcon icon={faShoppingBag} /></div>
+                                <div className="stat-content">
+                                    <h3>Total Orders</h3>
+                                    <p className="stat-value">{stats.totalOrders}</p>
+                                </div>
+                            </div>
+                            <div className="admin-stat-card">
+                                <div className="stat-icon"><FontAwesomeIcon icon={faUsers} /></div>
+                                <div className="stat-content">
+                                    <h3>Total Users</h3>
+                                    <p className="stat-value">{stats.totalUsers}</p>
+                                </div>
+                            </div>
+                            <div className="admin-stat-card">
+                                <div className="stat-icon"><FontAwesomeIcon icon={faBox} /></div>
+                                <div className="stat-content">
+                                    <h3>Total Products</h3>
+                                    <p className="stat-value">{stats.totalProducts}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h2 style={{ marginTop: '2rem' }}>Recent Orders</h2>
+                        <div className="admin-table-container">
+                            <table className="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Items</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {orders.slice(0, 5).map(order => (
+                                        <tr key={order.id}>
+                                            <td>{order.customer_email || 'Unknown'}</td>
+                                            <td>{order.items?.length || 0} items</td>
+                                            <td>LKR {order.total.toFixed(2)}</td>
+                                            <td><span className={`status-badge ${order.status}`}>{order.status}</span></td>
+                                            <td>{new Date(order.created_at).toLocaleDateString()}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </motion.div>
+                )}
+
+                {activeTab === 'products' && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <h1>Product Management</h1>
+                        
+                        <div className="admin-card">
+                            <h3><FontAwesomeIcon icon={faPlus} /> {editingProduct ? 'Edit Product' : 'Add New Product'}</h3>
+                            <div className="admin-form-grid">
+                                <input type="text" placeholder="Product Name" value={newProductName} onChange={(e) => setNewProductName(e.target.value)} />
+                                <input type="number" placeholder="Price" value={newProductPrice} onChange={(e) => setNewProductPrice(e.target.value)} />
+                                <input type="number" placeholder="Quantity" value={newProductQuantity} onChange={(e) => setNewProductQuantity(e.target.value)} />
+                                {categories.length === 0 ? (
+                                    <input type="text" placeholder="Category" value={newProductCategory} onChange={(e) => setNewProductCategory(e.target.value)} />
+                                ) : !showAddCategory ? (
+                                    <div className="custom-select-wrapper" style={{ position: 'relative' }}>
+                                        <div 
+                                            className={`admin-form-custom-select-trigger ${isCategoryDropdownOpen ? 'open' : ''}`}
+                                            onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                                        >
+                                            {newProductCategory}
+                                        </div>
+                                        {isCategoryDropdownOpen && (
+                                            <div className="custom-select-dropdown">
+                                                {categories.map(cat => (
+                                                    <div 
+                                                        key={cat.id}
+                                                        className="custom-select-option"
+                                                        onClick={() => {
+                                                            setNewProductCategory(cat.name);
+                                                            setIsCategoryDropdownOpen(false);
+                                                        }}
+                                                    >
+                                                        {cat.name}
+                                                    </div>
+                                                ))}
+                                                <div 
+                                                    className="custom-select-option add-new"
+                                                    onClick={() => {
+                                                        setTimeout(() => setShowAddCategory(true), 10);
+                                                        setIsCategoryDropdownOpen(false);
+                                                    }}
+                                                >
+                                                    + Add new category
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <input 
+                                            type="text" 
+                                            placeholder="New category name" 
+                                            value={newCategoryName} 
+                                            onChange={(e) => setNewCategoryName(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
+                                            autoFocus
+                                            style={{ padding: '0.75rem', border: '1px solid #ddd', borderRadius: '8px', fontSize: '0.95rem', flex: 1 }}
+                                        />
+                                        <button className="admin-btn primary" onClick={handleAddCategory}>Add</button>
+                                        <button className="admin-btn" onClick={() => { setShowAddCategory(false); setNewCategoryName(''); }} style={{ background: '#ddd', color: '#333' }}>Cancel</button>
+                                    </div>
+                                )}
+                                <div className="file-input-wrapper">
+                                    <label>
+                                        <FontAwesomeIcon icon={faImage} /> 
+                                        {newProductImageName ? newProductImageName : 'Upload Image'}
+                                    </label>
+                                    <input type="file" accept="image/*" onChange={(e) => { setNewProductImage(e.target.files?.[0] || null); setNewProductImageName(e.target.files?.[0]?.name || ''); }} />
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                <button className="admin-btn primary" onClick={handleSaveProduct} disabled={uploading}>
+                                    {uploading ? 'Saving...' : editingProduct ? 'Save Changes' : 'Add Product'}
+                                </button>
+                                {editingProduct && (
+                                    <button className="admin-btn" onClick={resetForm} style={{ background: '#ddd' }}>
+                                        Cancel
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        <h2 style={{ marginTop: '2rem' }}>All Products</h2>
+                        <div className="admin-table-container">
+                            <table className="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Price</th>
+                                        <th>Qty</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {products.map(product => (
+                                        <tr key={product.id} onClick={() => handleEditProduct(product)} style={{ cursor: 'pointer' }}>
+                                            <td><img src={product.image} alt={product.name} style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4 }} /></td>
+                                            <td>{product.name}</td>
+                                            <td>{product.category}</td>
+                                            <td>LKR {product.price.toFixed(2)}</td>
+                                            <td>{product.quantity || 0}</td>
+                                            <td onClick={(e) => e.stopPropagation()}>
+                                                <button className="admin-btn danger" onClick={() => handleDeleteProduct(product.id)}>
+                                                    <FontAwesomeIcon icon={faTrash} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </motion.div>
+                )}
+
+                {activeTab === 'orders' && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <h1>Orders Management</h1>
+                        <div className="admin-table-container">
+                            <table className="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Items</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {orders.map(order => (
+                                        <tr key={order.id}>
+                                            <td>{order.customer_email}</td>
+                                            <td>{order.items_detail?.map((item, i) => <div key={i}>{item.name}</div>)}</td>
+                                            <td>LKR {order.total.toFixed(2)}</td>
+                                            <td><span className={`status-badge ${order.status}`}>{order.status}</span></td>
+                                            <td>{new Date(order.created_at).toLocaleDateString()}</td>
+                                            <td>
+                                                <select value={order.status} onChange={(e) => handleStatusChange(order.id, e.target.value)} style={{ padding: '4px' }}>
+                                                    <option value="pending">Pending</option>
+                                                    <option value="processing">Processing</option>
+                                                    <option value="shipped">Shipped</option>
+                                                    <option value="delivered">Delivered</option>
+                                                    <option value="cancelled">Cancelled</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </motion.div>
+                )}
+
+                {activeTab === 'users' && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                        <h1>User Management</h1>
+                        <div className="admin-table-container">
+                            <table className="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Email</th>
+                                        <th>Joined</th>
+                                        <th>Total Spent</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {users.map(user => (
+                                        <tr key={user.id}>
+                                            <td>{user.email}</td>
+                                            <td>{new Date(user.created_at).toLocaleDateString()}</td>
+                                            <td style={{ fontWeight: 600, color: 'var(--accent)' }}>LKR {(user.total_spent || 0).toFixed(2)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </motion.div>
+                )}
+            </main>
+        </div>
+    );
+}
