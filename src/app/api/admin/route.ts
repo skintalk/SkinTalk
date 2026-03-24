@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
             }
 
             case 'place_order': {
-                const { userId, items, total, shippingAddress, subtotal, shippingCost, tax } = data;
+                const { userId, items, total, shippingAddress, subtotal, shippingCost } = data;
                 
                 const { data: order, error: orderError } = await adminClient.from('orders').insert({
                     user_id: userId,
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
                     total,
                     subtotal: subtotal || total,
                     shipping_cost: shippingCost || 0,
-                    tax: tax || 0,
+                    tax: 0,
                     shipping_address: shippingAddress || null,
                     status: 'pending'
                 }).select().single();

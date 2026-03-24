@@ -42,8 +42,10 @@ export default function CheckoutPage() {
     const [initialLoading, setInitialLoading] = useState(true);
     const [showQR, setShowQR] = useState(false);
     const [orderPlaced, setOrderPlaced] = useState(false);
+    const [invoiceNumber, setInvoiceNumber] = useState('');
 
     useEffect(() => {
+        setInvoiceNumber(`INV-${Math.floor(100000 + Math.random() * 900000)}`);
         checkAuth();
     }, []);
 
@@ -80,8 +82,7 @@ export default function CheckoutPage() {
 
     const cartTotal = cart.reduce((sum, item) => sum + (item.price || 0), 0);
     const shippingCost = cartTotal > 5000 ? 0 : 500;
-    const tax = cartTotal * 0.08;
-    const grandTotal = cartTotal + shippingCost + tax;
+    const grandTotal = cartTotal + shippingCost;
 
     const handlePlaceOrder = async () => {
         if (!user || !address.fullName || !address.street || !address.city || !address.phone) {
@@ -104,8 +105,7 @@ export default function CheckoutPage() {
                         total: grandTotal,
                         shippingAddress: address,
                         subtotal: cartTotal,
-                        shippingCost,
-                        tax
+                        shippingCost
                     },
                     userEmail: user.email
                 })
@@ -262,10 +262,14 @@ export default function CheckoutPage() {
                                     <span>Shipping</span>
                                     <span>{shippingCost === 0 ? 'Free' : `LKR ${shippingCost.toFixed(2)}`}</span>
                                 </div>
-                                <div className="bill-row">
-                                    <span>Tax (8%)</span>
-                                    <span>LKR {tax.toFixed(2)}</span>
-                                </div>
+                                
+                                {invoiceNumber && (
+                                    <div className="bill-row">
+                                        <span>Invoice No.</span>
+                                        <span style={{ fontFamily: 'monospace', fontWeight: 500, color: '#555' }}>#{invoiceNumber}</span>
+                                    </div>
+                                )}
+
                                 <div className="bill-row total">
                                     <span>Total</span>
                                     <span>LKR {grandTotal.toFixed(2)}</span>
