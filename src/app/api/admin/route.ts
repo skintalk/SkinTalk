@@ -27,13 +27,19 @@ export async function POST(request: NextRequest) {
 
         switch (action) {
             case 'add_product': {
-                const { name, price, quantity, image, category } = data;
+                const { name, price, quantity, image, category, description, benefits, how_to_use, ingredients, short_benefit, item_code } = data;
                 const { data: product, error } = await adminClient.from('products').insert({
                     name,
                     price,
                     quantity,
                     image,
-                    category
+                    category,
+                    description,
+                    benefits,
+                    how_to_use,
+                    ingredients,
+                    short_benefit,
+                    item_code
                 }).select().single();
                 
                 if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -49,7 +55,7 @@ export async function POST(request: NextRequest) {
             }
 
             case 'update_product': {
-                const { id, name, price, quantity, image, category, oldImage } = data;
+                const { id, name, price, quantity, image, category, description, benefits, how_to_use, ingredients, short_benefit, item_code, oldImage } = data;
                 
                 if (oldImage && oldImage !== image && oldImage.includes('supabase')) {
                     const fileName = oldImage.split('/').pop();
@@ -63,7 +69,13 @@ export async function POST(request: NextRequest) {
                     price,
                     quantity,
                     image,
-                    category
+                    category,
+                    description,
+                    benefits,
+                    how_to_use,
+                    ingredients,
+                    short_benefit,
+                    item_code
                 }).eq('id', id).select().single();
                 
                 if (error) return NextResponse.json({ error: error.message }, { status: 500 });

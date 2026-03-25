@@ -68,6 +68,10 @@ interface Product {
     category: string;
     quantity: number;
     description: string;
+    benefits?: string;
+    how_to_use?: string;
+    ingredients?: string;
+    short_benefit?: string;
     item_code?: string;
     created_at: string;
 }
@@ -109,6 +113,10 @@ export default function AdminPage() {
     const [newProductQuantity, setNewProductQuantity] = useState('');
     const [newProductCategory, setNewProductCategory] = useState('General');
     const [newProductDescription, setNewProductDescription] = useState('');
+    const [newProductBenefits, setNewProductBenefits] = useState('');
+    const [newProductHowToUse, setNewProductHowToUse] = useState('');
+    const [newProductIngredients, setNewProductIngredients] = useState('');
+    const [newProductShortBenefit, setNewProductShortBenefit] = useState('');
     const [newProductItemCode, setNewProductItemCode] = useState('');
     const [newProductImage, setNewProductImage] = useState<File | null>(null);
     const [newProductImageName, setNewProductImageName] = useState('');
@@ -318,6 +326,10 @@ export default function AdminPage() {
                 image: imgUrl,
                 category: newProductCategory,
                 description: newProductDescription,
+                benefits: newProductBenefits,
+                how_to_use: newProductHowToUse,
+                ingredients: newProductIngredients,
+                short_benefit: newProductShortBenefit,
                 item_code: newProductItemCode
             };
             if (editingProduct) {
@@ -381,6 +393,10 @@ export default function AdminPage() {
         setNewProductQuantity('');
         setNewProductCategory('General');
         setNewProductDescription('');
+        setNewProductBenefits('');
+        setNewProductHowToUse('');
+        setNewProductIngredients('');
+        setNewProductShortBenefit('');
         setNewProductItemCode('');
         setNewProductImage(null);
         setNewProductImageName('');
@@ -395,6 +411,10 @@ export default function AdminPage() {
         setNewProductQuantity(product.quantity?.toString() || '0');
         setNewProductCategory(product.category || 'General');
         setNewProductDescription(product.description || '');
+        setNewProductBenefits(product.benefits || '');
+        setNewProductHowToUse(product.how_to_use || '');
+        setNewProductIngredients(product.ingredients || '');
+        setNewProductShortBenefit(product.short_benefit || '');
         setNewProductItemCode(product.item_code || '');
         setNewProductImage(null);
         setNewProductImageName('');
@@ -622,11 +642,36 @@ export default function AdminPage() {
                                     </label>
                                     <input type="file" accept="image/*" onChange={(e) => { setNewProductImage(e.target.files?.[0] || null); setNewProductImageName(e.target.files?.[0]?.name || ''); }} />
                                 </div>
+                                <input 
+                                    type="text" 
+                                    placeholder="Short Benefit (e.g. Clears acne)" 
+                                    value={newProductShortBenefit} 
+                                    onChange={(e) => setNewProductShortBenefit(e.target.value)}
+                                    style={{ gridColumn: 'span 6', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.95rem', width: '100%' }}
+                                />
                                 <textarea 
                                     placeholder="Product Description" 
                                     value={newProductDescription} 
                                     onChange={(e) => setNewProductDescription(e.target.value)}
-                                    style={{ gridColumn: 'span 6', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd', minHeight: '100px', width: '100%', marginTop: '1rem' }}
+                                    style={{ gridColumn: 'span 6', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd', minHeight: '100px', width: '100%' }}
+                                />
+                                <textarea 
+                                    placeholder="Key Benefits (List them...)" 
+                                    value={newProductBenefits} 
+                                    onChange={(e) => setNewProductBenefits(e.target.value)}
+                                    style={{ gridColumn: 'span 6', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd', minHeight: '100px', width: '100%' }}
+                                />
+                                <textarea 
+                                    placeholder="How to Use (Step 1, Step 2...)" 
+                                    value={newProductHowToUse} 
+                                    onChange={(e) => setNewProductHowToUse(e.target.value)}
+                                    style={{ gridColumn: 'span 6', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd', minHeight: '100px', width: '100%' }}
+                                />
+                                <textarea 
+                                    placeholder="Ingredients" 
+                                    value={newProductIngredients} 
+                                    onChange={(e) => setNewProductIngredients(e.target.value)}
+                                    style={{ gridColumn: 'span 6', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd', minHeight: '100px', width: '100%' }}
                                 />
                             </div>
                             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>

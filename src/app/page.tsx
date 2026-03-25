@@ -396,18 +396,32 @@ export default function Home() {
                             <FadeIn key={product.id} delay={index * 0.1}>
                                 <motion.div className="product-card" whileHover={{ y: -10 }} transition={{ duration: 0.3 }}>
                                     <div className="product-image-container">
-                                        <img src={product.image} alt={product.name} className="product-img" />
+                                        <img 
+                                            src={product.image} 
+                                            alt={product.name} 
+                                            className="product-img" 
+                                            onClick={() => router.push(`/products/${product.id}`)}
+                                            style={{ cursor: 'pointer' }}
+                                        />
                                         {(!product.quantity || product.quantity <= 0) ? (
                                             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.85rem' }}>Out of Stock</div>
                                         ) : (
                                             <motion.button className="quick-add" onClick={() => addToCart(product)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Add to Bag</motion.button>
                                         )}
                                     </div>
-                                    <div className="product-info"><h3>{product.name}</h3><p className="product-price">LKR {product.price.toFixed(2)}</p></div>
+                                    <div className="product-info" onClick={() => router.push(`/products/${product.id}`)} style={{ cursor: 'pointer' }}>
+                                        <h3>{product.name}</h3>
+                                        <p className="product-price">LKR {product.price.toFixed(2)}</p>
+                                    </div>
                                 </motion.div>
                             </FadeIn>
                         ))}
                     </div>
+                    <FadeIn delay={0.4}>
+                        <div style={{ textAlign: 'center', marginTop: '4rem' }}>
+                            <button className="hero-cta" onClick={() => router.push('/products')}>See All Products</button>
+                        </div>
+                    </FadeIn>
                 </div>
             </section>
 
@@ -465,14 +479,23 @@ export default function Home() {
                                     {searchResults.map((product) => (
                                         <div className="product-card" key={product.id}>
                                             <div className="product-image-container">
-                                                <img src={product.image} alt={product.name} className="product-img" />
+                                                <img 
+                                                    src={product.image} 
+                                                    alt={product.name} 
+                                                    className="product-img" 
+                                                    onClick={() => { router.push(`/products/${product.id}`); setShowSearch(false); }}
+                                                    style={{ cursor: 'pointer' }}
+                                                />
                                                 {(!product.quantity || product.quantity <= 0) ? (
                                                     <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.85rem' }}>Out of Stock</div>
                                                 ) : (
                                                     <button className="quick-add" onClick={() => { addToCart(product); setShowSearch(false); setSearchQuery(''); }}>Add to Bag</button>
                                                 )}
                                             </div>
-                                            <div className="product-info"><h3>{product.name}</h3><p className="product-price">LKR {product.price.toFixed(2)}</p></div>
+                                            <div className="product-info" onClick={() => { router.push(`/products/${product.id}`); setShowSearch(false); }} style={{ cursor: 'pointer' }}>
+                                                <h3>{product.name}</h3>
+                                                <p className="product-price">LKR {product.price.toFixed(2)}</p>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
