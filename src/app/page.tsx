@@ -282,10 +282,10 @@ export default function Home() {
     useEffect(() => {
         if (theme === 'glow') {
             document.documentElement.style.setProperty('--bg-color', '#fffdfd');
-            document.documentElement.style.setProperty('--accent', '#ff8fa3');
+            document.documentElement.style.setProperty('--accent', '#4caf50');
         } else {
             document.documentElement.style.setProperty('--bg-color', '#ffffff');
-            document.documentElement.style.setProperty('--accent', '#e886a3');
+            document.documentElement.style.setProperty('--accent', '#2d5a27');
         }
     }, [theme]);
 
@@ -347,8 +347,8 @@ export default function Home() {
                     <div className="hero-content">
                         <FadeIn><p className="hero-subtitle">Premium Skincare</p></FadeIn>
                         <FadeIn delay={0.1}><h1 className="hero-title">Radiate<br />Confidence</h1></FadeIn>
-                        <FadeIn delay={0.2}><p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '2.5rem', maxWidth: 450 }}>Experience the perfect blend of minimalist design and pure ingredients. Discover your glow with SkinTalk.</p></FadeIn>
-                        <FadeIn delay={0.3}><a href="#shop" className="hero-cta">Shop the Collection</a></FadeIn>
+                        <FadeIn delay={0.2}><p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '2.5rem', maxWidth: 450 }}>Experience the perfect blend of minimalist design and pure ingredients. Discover your glow with SkinTalk. Launch Offer get 10% discount on every QR payment</p></FadeIn>
+                        <FadeIn delay={0.3}><a href="#shop" className="hero-cta">Shop Now</a></FadeIn>
                     </div>
                     <div className="hero-image-pane"><ParallaxImage src="/skintalk-hero.png" alt="Lady holding SkinTalk product" className="hero-img" /></div>
                 </div>
@@ -356,7 +356,7 @@ export default function Home() {
 
             <section className="collections" id="collections">
                 <div className="container">
-                    <FadeIn><h2 className="section-title">Shop by Concern</h2></FadeIn>
+                    <FadeIn><h2 className="section-title">Product Category</h2></FadeIn>
                     <div className="collections-grid">
                         <FadeIn delay={0}>
                             <motion.div className="collection-card" whileHover={{ scale: 1.02 }} transition={{ duration: 0.3 }}>
