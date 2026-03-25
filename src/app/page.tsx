@@ -364,7 +364,7 @@ export default function Home() {
 
             <section className="collections" id="collections">
                 <div className="container">
-                    <FadeIn><h2 className="section-title">Product Category</h2></FadeIn>
+                    <FadeIn><h2 className="section-title">Product Categories</h2></FadeIn>
                     <div className="collections-grid">
                         <FadeIn delay={0}>
                             <motion.div className="collection-card" whileHover={{ scale: 1.02 }} transition={{ duration: 0.3 }}>
