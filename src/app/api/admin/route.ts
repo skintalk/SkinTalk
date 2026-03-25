@@ -94,8 +94,15 @@ export async function POST(request: NextRequest) {
             }
 
             case 'place_order': {
-                const { userId, items, total, shippingAddress, subtotal, shippingCost } = data;
+                const { userId, items, total, shippingAddress, subtotal, shippingCost, invoiceNumber } = data;
                 
+                // 1. Fetch selected merchant details
+                const { data: merchant } = await adminClient
+                    .from('merchant_data')
+                    .select('*')
+                    .eq('selected', true)
+                    .single();
+
                 const { data: order, error: orderError } = await adminClient.from('orders').insert({
                     user_id: userId,
                     items,
@@ -104,11 +111,43 @@ export async function POST(request: NextRequest) {
                     shipping_cost: shippingCost || 0,
                     tax: 0,
                     shipping_address: shippingAddress || null,
-                    status: 'pending'
+                    status: 'pending',
+                    invoice_number: invoiceNumber || null
                 }).select().single();
                 
                 if (orderError) return NextResponse.json({ error: orderError.message }, { status: 500 });
                 
+                // 2. Generate QR Code if merchant exists
+                let qrBase64 = null;
+                if (merchant) {
+                    try {
+                        const qrResponse = await fetch('https://b2u-qr-worker.qr4pos.workers.dev/generate', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': 'Bearer skintalk-qr-key-secret-2026',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                amount: total.toFixed(2),
+                                reference_number: invoiceNumber || order.id.toString(), // Use invoiceNumber as reference
+                                merchant_id: merchant.merchant_id,
+                                bank_code: merchant.bank_code,
+                                terminal_id: merchant.terminal_id,
+                                merchant_name: merchant.merchant_name,
+                                merchant_city: merchant.merchant_city,
+                                mcc: merchant.mcc,
+                                currency_code: merchant.currency_code,
+                                country_code: merchant.country_code,
+                                format: 'base64'
+                            })
+                        });
+                        const qrData: any = await qrResponse.json();
+                        qrBase64 = qrData.base64;
+                    } catch (qrErr) {
+                        console.error('QR Generation failed:', qrErr);
+                    }
+                }
+
                 for (const item of items) {
                     const productId = item.product_id;
                     const { data: product } = await adminClient.from('products').select('quantity').eq('id', productId).single();
@@ -117,7 +156,7 @@ export async function POST(request: NextRequest) {
                     }
                 }
                 
-                return NextResponse.json({ success: true, data: order });
+                return NextResponse.json({ success: true, data: order, qr_base64: qrBase64 });
             }
 
             case 'upload_image': {

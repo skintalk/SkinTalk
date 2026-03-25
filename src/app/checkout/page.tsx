@@ -43,6 +43,7 @@ export default function CheckoutPage() {
     const [showQR, setShowQR] = useState(false);
     const [orderPlaced, setOrderPlaced] = useState(false);
     const [invoiceNumber, setInvoiceNumber] = useState('');
+    const [qrCode, setQrCode] = useState<string | null>(null);
     const qrRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -112,7 +113,8 @@ export default function CheckoutPage() {
                         total: grandTotal,
                         shippingAddress: address,
                         subtotal: cartTotal,
-                        shippingCost
+                        shippingCost,
+                        invoiceNumber
                     },
                     userEmail: user.email
                 })
@@ -123,6 +125,10 @@ export default function CheckoutPage() {
                 alert('Error placing order: ' + json.error);
                 setLoading(false);
                 return;
+            }
+
+            if (json.qr_base64) {
+                setQrCode(json.qr_base64);
             }
 
             const supabase = getSupabase();
@@ -310,7 +316,13 @@ export default function CheckoutPage() {
                                 <h3>Scan to Pay</h3>
                                 <p className="qr-subtitle">Scan the QR code with your bank app to complete payment</p>
                                 <div className="qr-code">
-                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=skintalk-payment" alt="Payment QR Code" />
+                                    {qrCode ? (
+                                        <img src={qrCode} alt="Payment QR Code" style={{ width: '100%', height: 'auto', maxWidth: '300px' }} />
+                                    ) : (
+                                        <div className="qr-placeholder" style={{ width: '200px', height: '200px', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
+                                            <p>Generating QR...</p>
+                                        </div>
+                                    )}
                                 </div>
                                 <p className="qr-amount">LKR {grandTotal.toFixed(2)}</p>
                                 <p className="qr-note">Show this QR code to complete your payment</p>
