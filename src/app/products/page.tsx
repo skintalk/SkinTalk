@@ -317,11 +317,6 @@ function ProductsPageContent() {
                             <li><a href="https://wa.me/94767678984" target="_blank">WhatsApp Us</a></li>
                         </ul>
                     </div>
-                    <div className="footer-newsletter">
-                        <h4>Stay Radiant</h4>
-                        <p>Sign up for exclusive beauty tips and early access to drops.</p>
-                        <div className="newsletter-form"><input type="email" placeholder="Email Address" /><button className="hero-cta">Join</button></div>
-                    </div>
                 </div>
                 <div className="container footer-bottom">&copy; 2026 SkinTalk Cosmetics. Artfully Crafted.</div>
             </footer>

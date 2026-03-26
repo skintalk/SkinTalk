@@ -553,14 +553,6 @@ export default function ProductDetailClient({
                             <li><a href="https://wa.me/94767678984" target="_blank">WhatsApp Us</a></li>
                         </ul>
                     </div>
-                    <div className="newsletter-form" style={{ maxWidth: '300px' }}>
-                        <h4 style={{ marginBottom: '1rem', color: '#1a1a1a' }}>Stay Radiant</h4>
-                        <p style={{ fontSize: '0.85rem', color: '#777', marginBottom: '1rem' }}>Sign up for exclusive beauty tips and early access to drops.</p>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <input type="email" placeholder="Email Address" style={{ padding: '0.8rem', border: '1px solid #eee', borderRadius: '4px', flex: 1, fontSize: '0.9rem' }} />
-                            <button className="hero-cta" style={{ padding: '0.8rem 1.5rem' }}>Join</button>
-                        </div>
-                    </div>
                 </div>
                 <div className="container footer-bottom">&copy; 2026 SkinTalk Cosmetics. Artfully Crafted.</div>
             </footer>
