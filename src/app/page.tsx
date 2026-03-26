@@ -352,7 +352,7 @@ export default function Home() {
             </div>
 
             <section className="hero" id="home">
-                <div className="container" style={{ display: 'flex', alignItems: 'center', width: '100%', height: '100%' }}>
+                <div className="container">
                     <div className="hero-content">
                         <FadeIn><p className="hero-subtitle">Premium Skincare</p></FadeIn>
                         <FadeIn delay={0.1}><h1 className="hero-title">Radiate<br />Confidence</h1></FadeIn>
