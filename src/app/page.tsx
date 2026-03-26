@@ -315,7 +315,7 @@ export default function Home() {
             <motion.header className={`header ${scrolled ? 'scrolled' : ''}`} initial={{ y: -100 }} animate={{ y: 0 }} transition={{ duration: 0.6 }}>
                 <div className="container nav-content">
                     <div className="logo">
-                        <img src="/logo.png" alt="SkinTalk" style={{ height: 90, objectFit: 'contain' }} />
+                        <img src="/logo.png" alt="SkinTalk" style={{ height: 120, objectFit: 'contain' }} />
                     </div>
                     <nav className="nav-links">
                         <a href="#home" className="nav-link">Home</a>
