@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faShoppingBag, faTimes, faBars, faMagic, faUser, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { motion, useInView } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import { getSupabase, isAdminEmail } from '@/lib/supabase';
 
 interface Product {
@@ -32,6 +33,14 @@ function FadeIn({ children, delay = 0, className = '' }: { children: React.React
 }
 
 export default function ProductsPage() {
+    return (
+        <Suspense fallback={<div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-serif)' }}>Loading...</div>}>
+            <ProductsPageContent />
+        </Suspense>
+    );
+}
+
+function ProductsPageContent() {
     const router = useRouter();
     const [scrolled, setScrolled] = useState(false);
     const [cartOpen, setCartOpen] = useState(false);
@@ -51,6 +60,22 @@ export default function ProductsPage() {
     const [authError, setAuthError] = useState('');
     const [isAdmin, setIsAdmin] = useState(false);
     const [products, setProducts] = useState<Product[]>([]);
+    const searchParams = useSearchParams();
+    const categoryParam = searchParams.get('category');
+
+    useEffect(() => {
+        if (categoryParam && products.length > 0) {
+            const targetId = `category-${categoryParam.toLowerCase()}`;
+            const element = document.getElementById(targetId);
+            if (element) {
+                setTimeout(() => {
+                    const yOffset = -100;
+                    const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                }, 500);
+            }
+        }
+    }, [categoryParam, products]);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -226,7 +251,7 @@ export default function ProductsPage() {
                         <p style={{ textAlign: 'center', color: '#999', marginTop: '4rem' }}>Loading our products...</p>
                     ) : (
                         Object.keys(groupedProducts).map((category, catIndex) => (
-                            <div key={category} style={{ marginBottom: '6rem' }}>
+                            <div key={category} id={`category-${category.toLowerCase()}`} style={{ marginBottom: '6rem' }}>
                                 <FadeIn delay={catIndex * 0.1}>
                                     <h2 style={{ 
                                         fontSize: '1.8rem', 
