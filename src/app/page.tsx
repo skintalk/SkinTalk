@@ -17,6 +17,12 @@ interface Product {
     slug?: string;
 }
 
+interface Category {
+    id: string;
+    name: string;
+    image_url?: string;
+}
+
 interface CartItem {
     product_id: string;
 }
@@ -63,10 +69,11 @@ export default function Home() {
     const [authError, setAuthError] = useState('');
     const [isAdmin, setIsAdmin] = useState(false);
     const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [newProductName, setNewProductName] = useState('');
     const [newProductPrice, setNewProductPrice] = useState('');
     const [newProductImage, setNewProductImage] = useState<File | null>(null);
-    const [newProductCategory, setNewProductCategory] = useState('General');
+    const [newProductCategory, setNewProductCategory] = useState('');
     const [uploading, setUploading] = useState(false);
     const [checkoutLoading, setCheckoutLoading] = useState(false);
 
@@ -166,8 +173,15 @@ export default function Home() {
         if (data) setProducts(data);
     };
 
+    const loadCategories = async () => {
+        const supabase = getSupabase();
+        const { data } = await supabase.from('categories').select('*');
+        if (data) setCategories(data);
+    };
+
     useEffect(() => {
         loadProducts();
+        loadCategories();
     }, []);
 
     const handleAddProduct = async () => {
@@ -367,54 +381,23 @@ export default function Home() {
                 <div className="container">
                     <FadeIn><h2 className="section-title">Product Categories</h2></FadeIn>
                     <div className="collections-grid">
-                        <FadeIn delay={0}>
-                            <motion.div 
-                                className="collection-card" 
-                                whileHover={{ scale: 1.02 }} 
-                                transition={{ duration: 0.3 }}
-                                onClick={() => router.push('/products?category=Haircare')}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <img src="/WhatsApp Image 2026-03-23 at 9.10.39 AM.jpeg" alt="Haircare" className="collection-img" />
-                                <div className="collection-overlay"><h2 className="collection-title">Haircare</h2><p>Targeted Treatment</p></div>
-                            </motion.div>
-                        </FadeIn>
-                        <FadeIn delay={0.15}>
-                            <motion.div 
-                                className="collection-card" 
-                                whileHover={{ scale: 1.02 }} 
-                                transition={{ duration: 0.3 }}
-                                onClick={() => router.push('/products?category=Skincare')}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <img src="/WhatsApp Image 2026-03-23 at 9.10.40 AM.jpeg" alt="Skincare" className="collection-img" />
-                                <div className="collection-overlay"><h2 className="collection-title">Skincare</h2><p>Deep Hydration</p></div>
-                            </motion.div>
-                        </FadeIn>
-                        <FadeIn delay={0.3}>
-                            <motion.div 
-                                className="collection-card" 
-                                whileHover={{ scale: 1.02 }} 
-                                transition={{ duration: 0.3 }}
-                                onClick={() => router.push('/products?category=Bodycare')}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <img src="/WhatsApp Image 2026-03-23 at 9.10.40 AM2.jpeg" alt="Bodycare" className="collection-img" />
-                                <div className="collection-overlay"><h2 className="collection-title">Bodycare</h2><p>Pure Reset</p></div>
-                            </motion.div>
-                        </FadeIn>
-                        <FadeIn delay={0.3}>
-                            <motion.div 
-                                className="collection-card" 
-                                whileHover={{ scale: 1.02 }} 
-                                transition={{ duration: 0.3 }}
-                                onClick={() => router.push('/products?category=Footcare')}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <img src="/WhatsApp Image 2026-03-23 at 9.10.39 AM2.jpeg" alt="Footcare" className="collection-img" />
-                                <div className="collection-overlay"><h2 className="collection-title">Footcare</h2><p>Pure Reset</p></div>
-                            </motion.div>
-                        </FadeIn>
+                        {categories.map((cat, index) => (
+                            <FadeIn key={cat.id} delay={index * 0.15}>
+                                <motion.div 
+                                    className="collection-card" 
+                                    whileHover={{ scale: 1.02 }} 
+                                    transition={{ duration: 0.3 }}
+                                    onClick={() => router.push(`/products?category=${cat.name}`)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <img src={cat.image_url || "/WhatsApp Image 2026-03-23 at 9.10.39 AM.jpeg"} alt={cat.name} className="collection-img" />
+                                    <div className="collection-overlay">
+                                        <h2 className="collection-title">{cat.name}</h2>
+                                        <p>Clean Beauty Choice</p>
+                                    </div>
+                                </motion.div>
+                            </FadeIn>
+                        ))}
                     </div>
                 </div>
             </section>
