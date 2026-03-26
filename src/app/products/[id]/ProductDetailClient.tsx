@@ -377,7 +377,7 @@ export default function ProductDetailClient({
                                                 whileHover={{ scale: 1.02 }}
                                                 whileTap={{ scale: 0.98 }}
                                             >
-                                                Add to Bag
+                                                Add to Cart
                                             </motion.button>
                                         </>
                                     )}
@@ -546,11 +546,11 @@ export default function ProductDetailClient({
             
             <div className={`sidebar ${cartOpen ? 'active' : ''}`} id="cart-sidebar">
                 <div className="sidebar-header">
-                    <h3>Your Beauty Bag</h3>
+                    <h3>Your Beauty Cart</h3>
                     <button className="icon-btn close-cart" onClick={() => setCartOpen(false)}><FontAwesomeIcon icon={faTimes} /></button>
                 </div>
                 <div className="sidebar-content">
-                    {cart.length === 0 ? <p className="empty-cart">Your bag is empty.</p> : cart.map((item: any, index: number) => (
+                    {cart.length === 0 ? <p className="empty-cart">Your Cart is empty.</p> : cart.map((item: any, index: number) => (
                         <div className="cart-item" key={index}>
                             <img src={item.image} alt={item.name} className="cart-item-img" />
                             <div className="cart-item-info"><h4>{item.name}</h4><p>LKR {(item.price || 0).toFixed(2)}</p><button onClick={() => removeFromCart(index)}>Remove</button></div>

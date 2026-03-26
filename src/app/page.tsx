@@ -437,7 +437,7 @@ export default function Home() {
                                         {(!product.quantity || product.quantity <= 0) ? (
                                             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.85rem' }}>Out of Stock</div>
                                         ) : (
-                                            <motion.button className="quick-add" onClick={() => addToCart(product)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Add to Bag</motion.button>
+                                            <motion.button className="quick-add" onClick={() => addToCart(product)} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Add to Cart</motion.button>
                                         )}
                                     </div>
                                     <div className="product-info" onClick={() => router.push(`/products/${product.slug || product.id}`)} style={{ cursor: 'pointer' }}>
@@ -481,11 +481,11 @@ export default function Home() {
             
             <div className={`sidebar ${cartOpen ? 'active' : ''}`} id="cart-sidebar">
                 <div className="sidebar-header">
-                    <h3>Your Beauty Bag</h3>
+                    <h3>Your Beauty Cart</h3>
                     <button className="icon-btn close-cart" onClick={() => setCartOpen(false)}><FontAwesomeIcon icon={faTimes} /></button>
                 </div>
                 <div className="sidebar-content">
-                    {cart.length === 0 ? <p className="empty-cart">Your bag is empty.</p> : cart.map((item: any, index: number) => {
+                    {cart.length === 0 ? <p className="empty-cart">Your Cart is empty.</p> : cart.map((item: any, index: number) => {
                         if (!item || !item.name) return null;
                         return (
                         <div className="cart-item" key={index}><img src={item.image} alt={item.name} className="cart-item-img" /><div className="cart-item-info"><h4>{item.name}</h4><p>LKR {(item.price || 0).toFixed(2)}</p><button onClick={() => removeFromCart(index)}>Remove</button></div></div>
@@ -520,7 +520,7 @@ export default function Home() {
                                                 {(!product.quantity || product.quantity <= 0) ? (
                                                     <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.85rem' }}>Out of Stock</div>
                                                 ) : (
-                                                    <button className="quick-add" onClick={() => { addToCart(product); setShowSearch(false); setSearchQuery(''); }}>Add to Bag</button>
+                                                    <button className="quick-add" onClick={() => { addToCart(product); setShowSearch(false); setSearchQuery(''); }}>Add to Cart</button>
                                                 )}
                                             </div>
                                             <div className="product-info" onClick={() => { router.push(`/products/${product.slug || product.id}`); setShowSearch(false); }} style={{ cursor: 'pointer' }}>
