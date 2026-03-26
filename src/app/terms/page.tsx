@@ -207,7 +207,90 @@ export default function TermsPage() {
                             <section style={{ marginBottom: '2.5rem' }}>
                                 <h2 style={{ fontFamily: 'var(--font-serif)', color: '#1a1a1a', marginBottom: '1rem' }}>1.6 Contact Information</h2>
                                 <p>Email: sales@skintalks.lk</p>
-                                <p>WhatsApp: (0767678984)</p>
+                                <p>WhatsApp: 0767678984</p>
+                            </section>
+
+                            <hr style={{ border: 'none', borderTop: '1px solid #eee', margin: '4rem 0' }} />
+
+                            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem', marginBottom: '2rem', color: '#1a1a1a' }}>Return & Refund Policy</h1>
+
+                            <section style={{ marginBottom: '2.5rem' }}>
+                                <h2 style={{ fontFamily: 'var(--font-serif)', color: '#1a1a1a', marginBottom: '1rem' }}>1. Overview</h2>
+                                <p>At Skintalks, we prioritize quality, safety, and customer satisfaction. Due to the nature of skincare and cosmetic products, our return policy is designed to ensure hygiene while offering fair support to our customers.</p>
+                            </section>
+
+                            <section style={{ marginBottom: '2.5rem' }}>
+                                <h2 style={{ fontFamily: 'var(--font-serif)', color: '#1a1a1a', marginBottom: '1rem' }}>2. Return Eligibility</h2>
+                                <p>You may request a return or exchange if:</p>
+                                <ul style={{ paddingLeft: '1.5rem', marginTop: '0.5rem' }}>
+                                    <li>The request is made within 3–7 days of delivery.</li>
+                                    <li>The product is unused, unopened, and in original packaging.</li>
+                                    <li>The product seal is intact and not tampered with.</li>
+                                    <li>You provide proof of purchase (order number or receipt).</li>
+                                </ul>
+                                <p style={{ marginTop: '1rem', fontStyle: 'italic', color: '#666' }}>👉 This aligns with common cosmetic policies where unopened items are accepted due to hygiene concerns.</p>
+                            </section>
+
+                            <section style={{ marginBottom: '2.5rem' }}>
+                                <h2 style={{ fontFamily: 'var(--font-serif)', color: '#1a1a1a', marginBottom: '1rem' }}>3. Non-Returnable Items</h2>
+                                <p>For safety and hygiene reasons, we do NOT accept returns for:</p>
+                                <ul style={{ paddingLeft: '1.5rem', marginTop: '0.5rem' }}>
+                                    <li>Opened or used skincare/cosmetic products.</li>
+                                    <li>Products with broken seals.</li>
+                                    <li>Items purchased on clearance or promotion.</li>
+                                    <li>Gift cards or free promotional items.</li>
+                                </ul>
+                            </section>
+
+                            <section style={{ marginBottom: '2.5rem' }}>
+                                <h2 style={{ fontFamily: 'var(--font-serif)', color: '#1a1a1a', marginBottom: '1rem' }}>4. Damaged, Defective, or Incorrect Items</h2>
+                                <p>We will gladly replace or refund items if:</p>
+                                <ul style={{ paddingLeft: '1.5rem', marginTop: '0.5rem' }}>
+                                    <li>The product is damaged, leaking, or broken.</li>
+                                    <li>You received the wrong item.</li>
+                                    <li>There is a manufacturing defect.</li>
+                                </ul>
+                                <div style={{ marginTop: '1rem', background: '#f9f9f9', padding: '1rem', borderRadius: '4px' }}>
+                                    <strong>📌 Conditions:</strong>
+                                    <ul style={{ paddingLeft: '1.5rem', marginTop: '0.5rem' }}>
+                                        <li>Must be reported within 24–48 hours of delivery.</li>
+                                        <li>Provide photos/videos as proof.</li>
+                                    </ul>
+                                </div>
+                            </section>
+
+                            <section style={{ marginBottom: '2.5rem' }}>
+                                <h2 style={{ fontFamily: 'var(--font-serif)', color: '#1a1a1a', marginBottom: '1rem' }}>5. Refund Policy</h2>
+                                <ul style={{ paddingLeft: '1.5rem', marginTop: '0.5rem' }}>
+                                    <li>Approved refunds will be processed to the original payment method.</li>
+                                    <li>Refunds may take 5–10 working days to reflect.</li>
+                                    <li>Shipping charges are non-refundable unless the error is ours.</li>
+                                </ul>
+                            </section>
+
+                            <section style={{ marginBottom: '2.5rem' }}>
+                                <h2 style={{ fontFamily: 'var(--font-serif)', color: '#1a1a1a', marginBottom: '1rem' }}>6. Exchanges</h2>
+                                <p>We offer exchanges only for damaged products or incorrect items.</p>
+                            </section>
+
+                            <section style={{ marginBottom: '2.5rem' }}>
+                                <h2 style={{ fontFamily: 'var(--font-serif)', color: '#1a1a1a', marginBottom: '1rem' }}>7. Return Process</h2>
+                                <p>To initiate a return, contact us via:</p>
+                                <ul style={{ paddingLeft: '1.5rem', marginTop: '0.5rem' }}>
+                                    <li>Email: sales@skintalks.lk</li>
+                                    <li>WhatsApp: 0767678984</li>
+                                </ul>
+                                <p style={{ marginTop: '1rem' }}>Please share your **Order number** and a **description of the issue**. Wait for approval before sending the item. Returns sent without approval will not be accepted.</p>
+                            </section>
+
+                            <section style={{ marginBottom: '2.5rem' }}>
+                                <h2 style={{ fontFamily: 'var(--font-serif)', color: '#1a1a1a', marginBottom: '1rem' }}>8. Order Cancellation</h2>
+                                <p>Orders can be cancelled only before dispatch. Once shipped, cancellation is not possible.</p>
+                            </section>
+
+                            <section style={{ marginBottom: '2.5rem' }}>
+                                <h2 style={{ fontFamily: 'var(--font-serif)', color: '#1a1a1a', marginBottom: '1rem' }}>9. Allergy / Skin Reaction Disclaimer</h2>
+                                <p>At Skintalks, we recommend performing a patch test before use. We are not liable for individual skin reactions unless the product is defective or expired.</p>
                             </section>
                         </div>
                     </motion.div>
