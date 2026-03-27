@@ -78,8 +78,8 @@ export default function AboutPage() {
                         transition={{ duration: 0.8 }}
                         style={{ textAlign: 'center', marginBottom: '5rem' }}
                     >
-                        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '3.5rem', marginBottom: '1.5rem', color: '#1a1a1a' }}>Our Story</h1>
-                        <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '700px', margin: '0 auto', lineHeight: '1.6' }}>
+                        <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '3.5rem', marginBottom: '1.5rem', color: 'var(--text-main)' }}>Our Story</h1>
+                        <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', maxWidth: '700px', margin: '0 auto', lineHeight: '1.6' }}>
                             Skintalks was created with a simple idea: skincare should be easy to understand, honest, and accessible to everyone.
                         </p>
                     </motion.div>
@@ -88,11 +88,11 @@ export default function AboutPage() {
                     <section style={{ marginBottom: '6rem' }}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }}>
                             <div>
-                                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', marginBottom: '1.5rem' }}>Where it all began</h2>
-                                <p style={{ lineHeight: '1.8', color: '#444', marginBottom: '1.5rem' }}>
+                                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', marginBottom: '1.5rem', color: 'var(--text-main)' }}>Where it all began</h2>
+                                <p style={{ lineHeight: '1.8', color: 'var(--text-main)', marginBottom: '1.5rem' }}>
                                     Founded in 2020, Skintalks began with a vision to simplify skincare and make effective products available to everyone. We saw that many people struggle to find products that truly suit their skin. With so many options in the market, skincare can often feel confusing and overwhelming.
                                 </p>
-                                <p style={{ lineHeight: '1.8', color: '#444' }}>
+                                <p style={{ lineHeight: '1.8', color: 'var(--text-main)' }}>
                                     We wanted to create products that speak to your skin, using carefully selected ingredients that are gentle, effective, and suitable for everyday use.
                                 </p>
                             </div>
@@ -108,13 +108,13 @@ export default function AboutPage() {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem' }}>
                             <div style={{ padding: '2rem', background: '#fffcfd', borderRadius: '16px' }}>
                                 <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--accent)' }}>The Power of Herbs</h3>
-                                <p style={{ fontSize: '0.95rem', lineHeight: '1.7', color: '#555' }}>
+                                <p style={{ fontSize: '0.95rem', lineHeight: '1.7', color: 'var(--text-muted)' }}>
                                     We use powerful, locally sourced herbal ingredients, carefully selected to maintain authenticity and deliver real results. Our focus is on creating products that stay true to their roots while meeting modern skincare needs.
                                 </p>
                             </div>
                             <div style={{ padding: '2rem', background: '#fffcfd', borderRadius: '16px' }}>
                                 <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', color: 'var(--accent)' }}>Our Commitment</h3>
-                                <ul style={{ fontSize: '0.95rem', lineHeight: '1.7', color: '#555', paddingLeft: '1.2rem' }}>
+                                <ul style={{ fontSize: '0.95rem', lineHeight: '1.7', color: 'var(--text-muted)', paddingLeft: '1.2rem' }}>
                                     <li>Preserving the authenticity of herbal skincare</li>
                                     <li>Using ingredients that are locally sourced and trusted</li>
                                     <li>Effective yet gentle for everyday use</li>

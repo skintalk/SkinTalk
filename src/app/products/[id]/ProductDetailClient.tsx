@@ -418,7 +418,7 @@ export default function ProductDetailClient({
                             onClick={() => router.push('/products')} 
                             style={{ 
                                 cursor: 'pointer', 
-                                color: '#888', 
+                                color: 'var(--text-muted)', 
                                 fontSize: '0.9rem', 
                                 display: 'flex', 
                                 alignItems: 'center', 
@@ -435,7 +435,7 @@ export default function ProductDetailClient({
                         {/* Left: Product Image Gallery */}
                         <FadeIn>
                             <div className="product-gallery">
-                                <div style={{ position: 'relative', width: '100%', height: '550px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }}>
+                                <div style={{ position: 'relative', width: '100%', height: '650px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }}>
                                     <Image 
                                         src={product.image} 
                                         alt={product.image_alt || product.name} 
@@ -450,9 +450,9 @@ export default function ProductDetailClient({
                         {/* Right: Product Info */}
                         <FadeIn delay={0.2}>
                             <div className="product-details">
-                                <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem', marginBottom: '0.5rem', color: '#1a1a1a' }}>{product.name}</h1>
+                                <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem', marginBottom: '0.5rem', color: 'var(--text-main)' }}>{product.name}</h1>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                                    <h2 style={{ fontSize: '1.8rem', fontWeight: '500', color: '#333' }}>LKR {product.price.toFixed(2)}</h2>
+                                    <h2 style={{ fontSize: '1.8rem', fontWeight: '500', color: 'var(--text-main)' }}>LKR {product.price.toFixed(2)}</h2>
                                     <div style={{ color: '#FFD700', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <div style={{ display: 'flex', gap: '2px' }}>
                                             {[1, 2, 3, 4, 5].map((star) => (
@@ -463,18 +463,18 @@ export default function ProductDetailClient({
                                                 />
                                             ))}
                                         </div>
-                                        <span style={{ color: '#888', fontSize: '0.9rem', fontWeight: '400' }}>({reviews.length} {reviews.length === 1 ? 'Review' : 'Reviews'})</span>
+                                        <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: '400' }}>({reviews.length} {reviews.length === 1 ? 'Review' : 'Reviews'})</span>
                                     </div>
                                 </div>
 
                                 {product.short_benefit && (
-                                    <p style={{ fontSize: '1rem', color: '#888', marginBottom: '1rem', fontStyle: 'italic' }}>
+                                    <p style={{ fontSize: '1rem', color: 'var(--text-muted)', marginBottom: '1rem', fontStyle: 'italic' }}>
                                         &quot;{product.short_benefit}&quot;
                                     </p>
                                 )}
 
                                 {product.description && (
-                                    <div style={{ fontSize: '1.05rem', color: '#555', marginBottom: '1.5rem', lineHeight: '1.7' }}>
+                                    <div style={{ fontSize: '1.05rem', color: 'var(--text-main)', marginBottom: '1.5rem', lineHeight: '1.7' }}>
                                         {product.description}
                                     </div>
                                 )}
@@ -508,7 +508,7 @@ export default function ProductDetailClient({
                                                                 style={{ position: 'absolute', width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e' }} 
                                                             />
                                                         </div>
-                                                        <span style={{ fontSize: '0.8rem', color: '#444' }}>
+                                                        <span style={{ fontSize: '0.8rem', color: 'var(--text-main)' }}>
                                                             <strong style={{ color: 'var(--brand-green)' }}>{buyersToday} people</strong> bought this today.
                                                         </span>
                                                     </div>
@@ -543,28 +543,28 @@ export default function ProductDetailClient({
                                             <FontAwesomeIcon icon={faShieldAlt} style={{ color: 'var(--brand-green)', fontSize: '1.2rem' }} />
                                             <div>
                                                 <p style={{ fontSize: '0.75rem', fontWeight: 'bold', margin: 0 }}>Secure Payments</p>
-                                                <p style={{ fontSize: '0.65rem', color: '#888', margin: 0 }}>LankaQR & Card</p>
+                                                <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', margin: 0 }}>LankaQR & Card</p>
                                             </div>
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                             <FontAwesomeIcon icon={faStar} style={{ color: 'var(--brand-green)', fontSize: '1.2rem' }} />
                                             <div>
                                                 <p style={{ fontSize: '0.75rem', fontWeight: 'bold', margin: 0 }}>Dermatological</p>
-                                                <p style={{ fontSize: '0.65rem', color: '#888', margin: 0 }}>Tested & Approved</p>
+                                                <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', margin: 0 }}>Tested & Approved</p>
                                             </div>
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                             <FontAwesomeIcon icon={faTruck} style={{ color: 'var(--brand-green)', fontSize: '1.2rem' }} />
                                             <div>
                                                 <p style={{ fontSize: '0.75rem', fontWeight: 'bold', margin: 0 }}>Fast Delivery</p>
-                                                <p style={{ fontSize: '0.65rem', color: '#888', margin: 0 }}>Island-wide 2-4 Days</p>
+                                                <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', margin: 0 }}>Island-wide 2-4 Days</p>
                                             </div>
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                                             <FontAwesomeIcon icon={faUndo} style={{ color: 'var(--brand-green)', fontSize: '1.2rem' }} />
                                             <div>
                                                 <p style={{ fontSize: '0.75rem', fontWeight: 'bold', margin: 0 }}>7-Day Returns</p>
-                                                <p style={{ fontSize: '0.65rem', color: '#888', margin: 0 }}>Stress-free Shopping</p>
+                                                <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', margin: 0 }}>Stress-free Shopping</p>
                                             </div>
                                         </div>
                                     </div>
@@ -612,7 +612,7 @@ export default function ProductDetailClient({
                                                 <FontAwesomeIcon key={star} icon={faStar} style={{ color: star <= Math.round(averageRating) ? '#FFD700' : '#ddd' }} />
                                             ))}
                                         </div>
-                                        <p style={{ color: '#888', fontSize: '0.9rem' }}>Based on {reviews.length} reviews</p>
+                                        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Based on {reviews.length} reviews</p>
                                     </div>
                                 </div>
 
@@ -644,13 +644,13 @@ export default function ProductDetailClient({
                                         >
                                             {submittingReview ? 'Posting...' : 'Post Review'}
                                         </button>
-                                        {!user && <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '1rem', textAlign: 'center' }}>Please sign in to post a review.</p>}
+                                        {!user && <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '1rem', textAlign: 'center' }}>Please sign in to post a review.</p>}
                                     </div>
 
                                     {/* Reviews List */}
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                                         {reviews.length === 0 ? (
-                                            <div style={{ textAlign: 'center', padding: '4rem 0', background: '#fcfcfc', borderRadius: '12px', color: '#888' }}>
+                                            <div style={{ textAlign: 'center', padding: '4rem 0', background: '#fcfcfc', borderRadius: '12px', color: 'var(--text-muted)' }}>
                                                 No reviews yet. Be the first to share your thoughts!
                                             </div>
                                         ) : (
@@ -665,9 +665,9 @@ export default function ProductDetailClient({
                                                                 ))}
                                                             </div>
                                                         </div>
-                                                        <span style={{ fontSize: '0.8rem', color: '#aaa' }}>{new Date(review.created_at).toLocaleDateString()}</span>
+                                                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{new Date(review.created_at).toLocaleDateString()}</span>
                                                     </div>
-                                                    <p style={{ color: '#555', lineHeight: '1.6', fontSize: '1rem' }}>{review.comment}</p>
+                                                    <p style={{ color: 'var(--text-main)', lineHeight: '1.6', fontSize: '1rem' }}>{review.comment}</p>
                                                 </div>
                                             ))
                                         )}

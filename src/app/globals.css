@@ -3,12 +3,12 @@
 :root {
     --bg-color: #ffffff;
     --secondary-bg: #fdfafb;
-    --text-main: #111111;
-    --text-muted: #777777;
+    --text-main: #004236; /* Unified Brand Green */
+    --text-muted: rgba(0, 66, 54, 0.6); /* Translucent Brand Green */
     --accent: #2d5a27;
-    --accent-hover: #2d5a27;
+    --accent-hover: #004236;
     --border-color: #f1f1f1;
-    --card-shadow: 0 4px 25px rgba(45, 90, 39, 0.08);
+    --card-shadow: 0 4px 25px rgba(0, 66, 54, 0.08);
     
     --font-serif: 'Playfair Display', serif;
     --font-sans: 'Jost', sans-serif;
@@ -73,6 +73,7 @@ h1, h2, h3, h4 {
     text-align: center;
     margin-bottom: 2rem;
     position: relative;
+    color: var(--brand-green);
 }
 
 .section-title::after {
@@ -184,7 +185,7 @@ h1, h2, h3, h4 {
 
 .header-search input::placeholder {
     text-align: left;
-    color: #999;
+    color: var(--text-muted);
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.12em;
@@ -195,7 +196,7 @@ h1, h2, h3, h4 {
     right: 18px;
     top: 50%;
     transform: translateY(-50%);
-    color: #666;
+    color: var(--text-muted);
     pointer-events: none;
     font-size: 1rem;
     transition: color 0.3s ease;
@@ -228,7 +229,7 @@ h1, h2, h3, h4 {
     border: none;
     cursor: pointer;
     font-size: 1.2rem;
-    color: #333;
+    color: var(--text-main);
     transition: var(--transition);
 }
 
@@ -254,7 +255,7 @@ h1, h2, h3, h4 {
 
 .cat-nav-link {
     text-decoration: none;
-    color: #333;
+    color: var(--text-main);
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -267,7 +268,7 @@ h1, h2, h3, h4 {
 }
 
 .cat-nav-link.active {
-    color: #804d80; /* A magenta-like color seen in "DEWBERRY" in image */
+    color: var(--brand-green);
 }
 
 /* Hide original header classes */
@@ -482,6 +483,7 @@ h1, h2, h3, h4 {
     font-size: 3.5rem;
     line-height: 1.1;
     margin-bottom: 2rem;
+    color: var(--brand-green);
 }
 
 .hero-cta {
@@ -683,7 +685,7 @@ h1, h2, h3, h4 {
     font-family: var(--font-sans);
     font-size: 0.95rem;
     font-weight: 500;
-    color: #1a1a1a;
+    color: var(--text-main);
     transition: color 0.2s;
 }
 
@@ -694,7 +696,7 @@ h1, h2, h3, h4 {
 .accordion-icon {
     font-size: 0.8rem;
     transition: transform 0.3s ease;
-    color: #888;
+    color: var(--text-muted);
 }
 
 .accordion-item.active .accordion-icon {
@@ -1143,7 +1145,7 @@ h1, h2, h3, h4 {
 .cart-item-info button {
     background: none;
     border: none;
-    color: #aaa;
+    color: var(--text-muted);
     font-size: 0.7rem;
     cursor: pointer;
     margin-top: 0.5rem;
@@ -1165,7 +1167,7 @@ h1, h2, h3, h4 {
 
 .empty-cart {
     text-align: center;
-    color: #999;
+    color: var(--text-muted);
     margin-top: 3rem;
 }
 
@@ -1203,7 +1205,7 @@ h1, h2, h3, h4 {
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: #aaa;
+    color: var(--text-muted);
     margin-bottom: 1.5rem;
     font-family: var(--font-sans);
 }
@@ -1232,7 +1234,7 @@ h1, h2, h3, h4 {
 
 .admin-product-form p {
     font-size: 0.85rem;
-    color: #888;
+    color: var(--text-muted);
     margin-bottom: 1rem;
 }
 
@@ -1252,7 +1254,7 @@ h1, h2, h3, h4 {
 
 @media (max-width: 992px) {
     .hero-content p {
-        color: #333 !important;
+        color: var(--text-main) !important;
         font-weight: 500;
         text-shadow: 0 1px 5px rgba(255,255,255,0.5);
     }
@@ -1470,7 +1472,7 @@ h1, h2, h3, h4 {
     border: none;
     font-size: 1.2rem;
     cursor: pointer;
-    color: #999;
+    color: var(--text-muted);
 }
 
 .auth-modal h2 {
@@ -1526,7 +1528,7 @@ h1, h2, h3, h4 {
     background: none;
     border: none;
     font-size: 1.5rem;
-    color: #888;
+    color: var(--text-muted);
     cursor: pointer;
 }
 
@@ -1543,7 +1545,7 @@ h1, h2, h3, h4 {
 
 .admin-sidebar-header p {
     font-size: 0.8rem;
-    color: #888;
+    color: var(--text-muted);
     margin: 0.3rem 0 0;
 }
 
@@ -1562,7 +1564,7 @@ h1, h2, h3, h4 {
     background: none;
     cursor: pointer;
     font-size: 0.95rem;
-    color: #555;
+    color: var(--text-main);
     transition: all 0.2s;
     text-align: left;
 }
@@ -1592,7 +1594,7 @@ h1, h2, h3, h4 {
 .admin-main h1 {
     font-size: 1.8rem;
     margin-bottom: 1.5rem;
-    color: #333;
+    color: var(--text-main);
 }
 
 .admin-mobile-header {
@@ -1608,7 +1610,7 @@ h1, h2, h3, h4 {
     background: none;
     border: none;
     font-size: 1.5rem;
-    color: #333;
+    color: var(--text-main);
     cursor: pointer;
 }
 
@@ -1648,7 +1650,7 @@ h1, h2, h3, h4 {
 
 .stat-content h3 {
     font-size: 0.85rem;
-    color: #888;
+    color: var(--text-muted);
     margin: 0;
     font-weight: 500;
 }
@@ -1656,7 +1658,7 @@ h1, h2, h3, h4 {
 .stat-value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #333;
+    color: var(--text-main);
     margin: 0.3rem 0 0;
 }
 
@@ -1671,7 +1673,7 @@ h1, h2, h3, h4 {
 .admin-card h3 {
     margin: 0 0 1rem;
     font-size: 1.1rem;
-    color: #333;
+    color: var(--text-main);
 }
 
 .admin-form-grid {
@@ -1688,7 +1690,7 @@ h1, h2, h3, h4 {
     border-radius: 8px;
     font-size: 0.95rem;
     background: #fff;
-    color: #333;
+    color: var(--text-main);
     cursor: pointer;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -1898,14 +1900,14 @@ h1, h2, h3, h4 {
     flex: 1;
     margin: 0;
     font-size: 1.5rem;
-    color: #333;
+    color: var(--text-main);
 }
 
 .checkout-steps {
     display: flex;
     gap: 1rem;
     font-size: 0.85rem;
-    color: #999;
+    color: var(--text-muted);
 }
 
 .checkout-steps span.active {
@@ -1942,7 +1944,7 @@ h1, h2, h3, h4 {
 .checkout-form h3 {
     font-size: 1.1rem;
     margin-bottom: 1rem;
-    color: #333;
+    color: var(--text-main);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -2022,12 +2024,12 @@ h1, h2, h3, h4 {
 .checkout-review h3 {
     font-size: 1rem;
     margin-bottom: 0.75rem;
-    color: #333;
+    color: var(--text-main);
 }
 
 .checkout-review p {
     margin: 0.25rem 0;
-    color: #555;
+    color: var(--text-main);
     font-size: 0.9rem;
 }
 
@@ -2062,7 +2064,7 @@ h1, h2, h3, h4 {
 
 .order-item .item-name {
     font-weight: 500;
-    color: #333;
+    color: var(--text-main);
 }
 
 .order-item .item-price {
@@ -2081,7 +2083,7 @@ h1, h2, h3, h4 {
     display: flex;
     justify-content: space-between;
     padding: 0.5rem 0;
-    color: #555;
+    color: var(--text-main);
     font-size: 0.9rem;
 }
 
@@ -2091,7 +2093,7 @@ h1, h2, h3, h4 {
     padding-top: 1rem;
     font-weight: 700;
     font-size: 1.1rem;
-    color: #333;
+    color: var(--text-main);
 }
 
 @media (max-width: 600px) {
@@ -2129,13 +2131,13 @@ h1, h2, h3, h4 {
 .admin-table th {
     background: #f8f9fa;
     font-weight: 600;
-    color: #555;
+    color: var(--text-main);
     font-size: 0.85rem;
     text-transform: uppercase;
 }
 
 .admin-table td {
-    color: #444;
+    color: var(--text-main);
     font-size: 0.95rem;
 }
 
@@ -2299,21 +2301,21 @@ h1, h2, h3, h4 {
 .admin-modal-header h3 {
     margin: 0;
     font-size: 1.1rem;
-    color: #333;
+    color: var(--text-main);
 }
 
 .close-btn {
     background: none;
     border: none;
     font-size: 1.2rem;
-    color: #999;
+    color: var(--text-muted);
     cursor: pointer;
     padding: 0.25rem;
     transition: color 0.2s;
 }
 
 .close-btn:hover {
-    color: #333;
+    color: var(--text-main);
 }
 
 .admin-modal-body {

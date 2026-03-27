@@ -368,7 +368,7 @@ function ProductsPageContent() {
                                     ))}
                                 </div>
                             ) : (
-                                <p style={{ textAlign: 'center', color: '#999', padding: '2rem' }}>No products found for &quot;{searchQuery}&quot;</p>
+                                <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>No products found for &quot;{searchQuery}&quot;</p>
                             )}
                         </div>
                     </div>
