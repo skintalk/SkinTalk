@@ -87,9 +87,10 @@ export default function Home() {
     const [newProductCategory, setNewProductCategory] = useState('');
     const [uploading, setUploading] = useState(false);
     const [checkoutLoading, setCheckoutLoading] = useState(false);
-
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         const supabase = getSupabase();
         supabase.auth.getUser().then(({ data: { user } }) => {
             setUser(user);
@@ -114,7 +115,7 @@ export default function Home() {
             const element = document.getElementById('collections');
             if (element) {
                 setTimeout(() => {
-                    const yOffset = -120; // Ensure title is visible below header
+                    const yOffset = -180; // More generous clearance for the multi-layer header
                     const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
                     window.scrollTo({ top: y, behavior: 'smooth' });
                 }, 150); // Shorter delay for cleaner transition
@@ -358,14 +359,16 @@ export default function Home() {
                 categories={categories}
             />
 
-            <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
-                <nav className="mobile-nav">
-                    <a href="#home" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Home</a>
-                    <a href="#shop" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Shop</a>
-                    <a href="#collections" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Collections</a>
-                    <a href="#about" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Our Story</a>
-                </nav>
-            </div>
+            {mounted && (
+                <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
+                    <nav className="mobile-nav">
+                        <a href="#home" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Home</a>
+                        <a href="/products" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Shop</a>
+                        <a href="#collections" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Collection</a>
+                        <a href="#about" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Our Story</a>
+                    </nav>
+                </div>
+            )}
 
             <section className="hero" id="home">
                 <div className="container">

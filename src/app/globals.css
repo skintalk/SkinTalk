@@ -13,10 +13,23 @@
     --font-serif: 'Playfair Display', serif;
     --font-sans: 'Jost', sans-serif;
     
-    --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --brand-green: #004236; /* Body Shop deep green */
     --header-height: auto;
     --announcement-bar-height: 30px;
+}
+
+/* Scroll Offset Fixes for Fixed Header */
+section[id],
+div[id^="category-"] {
+    scroll-margin-top: 180px;
+}
+
+@media (max-width: 992px) {
+    section[id],
+    div[id^="category-"] {
+        scroll-margin-top: 140px; /* Smaller header on mobile */
+    }
 }
 
 * {

@@ -69,6 +69,7 @@ function ProductsPageContent() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [mounted, setMounted] = useState(false);
     const searchParams = useSearchParams();
     const categoryParam = searchParams.get('category');
 
@@ -78,7 +79,7 @@ function ProductsPageContent() {
             const element = document.getElementById(targetId);
             if (element) {
                 setTimeout(() => {
-                    const yOffset = -100;
+                    const yOffset = -180; // Adjusted for fixed header
                     const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
                     window.scrollTo({ top: y, behavior: 'smooth' });
                 }, 500);
@@ -90,6 +91,7 @@ function ProductsPageContent() {
 
 
     useEffect(() => {
+        setMounted(true);
         sessionStorage.setItem('fromProducts', 'true');
         const supabase = getSupabase();
         supabase.auth.getUser().then(({ data: { user } }) => {
@@ -231,12 +233,16 @@ function ProductsPageContent() {
                 categories={categories}
             />
 
-            <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
-                <nav className="mobile-nav">
-                    <a onClick={() => { router.push('/'); setMobileMenuOpen(false); }} className="mobile-nav-link" style={{ cursor: 'pointer' }}>Home</a>
-                    <a onClick={() => { router.push('/products'); setMobileMenuOpen(false); }} className="mobile-nav-link" style={{ cursor: 'pointer' }}>Shop</a>
-                </nav>
-            </div>
+            {mounted && (
+                <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
+                    <nav className="mobile-nav">
+                        <a onClick={() => { router.push('/'); setMobileMenuOpen(false); }} className="mobile-nav-link" style={{ cursor: 'pointer' }}>Home</a>
+                        <a onClick={() => { router.push('/products'); setMobileMenuOpen(false); }} className="mobile-nav-link" style={{ cursor: 'pointer' }}>Shop</a>
+                        <a onClick={() => { router.push('/#collections'); setMobileMenuOpen(false); }} className="mobile-nav-link" style={{ cursor: 'pointer' }}>Collection</a>
+                        <a onClick={() => { router.push('/#about'); setMobileMenuOpen(false); }} className="mobile-nav-link" style={{ cursor: 'pointer' }}>Our Story</a>
+                    </nav>
+                </div>
+            )}
 
             <section className="products" style={{ minHeight: '80vh', padding: '20px 0' }}>
                 <div className="container">

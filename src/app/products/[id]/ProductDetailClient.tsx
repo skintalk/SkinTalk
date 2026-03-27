@@ -96,6 +96,7 @@ export default function ProductDetailClient({
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [categories, setCategories] = useState<Category[]>([]);
+    const [mounted, setMounted] = useState(false);
 
     // Review States
     const [reviews, setReviews] = useState<Review[]>(initialReviews);
@@ -110,6 +111,11 @@ export default function ProductDetailClient({
     
     // Social Proof State
     const [buyersToday, setBuyersToday] = useState(0);
+
+    useEffect(() => {
+        setMounted(true);
+        loadSalesActivity();
+    }, []);
 
     const loadSalesActivity = async () => {
         try {
@@ -393,6 +399,17 @@ export default function ProductDetailClient({
                 onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
                 categories={categories}
             />
+
+            {mounted && (
+                <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
+                    <nav className="mobile-nav">
+                        <a onClick={() => { router.push('/'); setMobileMenuOpen(false); }} className="mobile-nav-link" style={{ cursor: 'pointer' }}>Home</a>
+                        <a onClick={() => { router.push('/products'); setMobileMenuOpen(false); }} className="mobile-nav-link" style={{ cursor: 'pointer' }}>Shop</a>
+                        <a onClick={() => { router.push('/#collections'); setMobileMenuOpen(false); }} className="mobile-nav-link" style={{ cursor: 'pointer' }}>Collection</a>
+                        <a onClick={() => { router.push('/#about'); setMobileMenuOpen(false); }} className="mobile-nav-link" style={{ cursor: 'pointer' }}>Our Story</a>
+                    </nav>
+                </div>
+            )}
 
             <section style={{ padding: '10px 0', marginTop: '0.5rem' }}>
                 <div className="container">

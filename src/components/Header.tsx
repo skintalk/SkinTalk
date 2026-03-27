@@ -26,8 +26,10 @@ export default function Header({ user, cartCount, onLogout, onLoginClick, onCart
     const router = useRouter();
     const [scrolled, setScrolled] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         const handleScroll = () => setScrolled(window.scrollY > 100);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
@@ -85,20 +87,25 @@ export default function Header({ user, cartCount, onLogout, onLoginClick, onCart
 
             <div className="sub-header">
                 <nav className="cat-nav">
-                    <ul className="cat-nav-links">
-                        <li><Link href="/" className="cat-nav-link">Home</Link></li>
-                        {categories.map((cat) => (
-                            <li key={cat.id}>
-                                <Link 
-                                    href={`/products?category=${encodeURIComponent(cat.name)}`}
-                                    className="cat-nav-link"
-                                >
-                                    {cat.name}
-                                </Link>
-                            </li>
-                        ))}
-                        <li><Link href="/about" className="cat-nav-link">About Us</Link></li>
-                    </ul>
+                    {mounted && (
+                        <ul className="cat-nav-links">
+                            <li><Link href="/" className="cat-nav-link">Home</Link></li>
+                            <li><Link href="/about" className="cat-nav-link">Our Story</Link></li>
+                            <li><Link href="/products" className="cat-nav-link">Shop</Link></li>
+                            <li><Link href="/#collections" className="cat-nav-link">Collection</Link></li>
+                            {categories.map((cat) => (
+                                <li key={cat.id}>
+                                    <Link 
+                                        href={`/products?category=${encodeURIComponent(cat.name)}`}
+                                        className="cat-nav-link"
+                                    >
+                                        {cat.name}
+                                    </Link>
+                                </li>
+                            ))}
+                            <li><Link href="/#about" className="cat-nav-link">About Us</Link></li>
+                        </ul>
+                    )}
                 </nav>
             </div>
         </motion.header>

@@ -22,7 +22,11 @@ export default function AboutPage() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [categories, setCategories] = useState<Category[]>([]);
 
+    const [mounted, setMounted] = useState(false);
+
     useEffect(() => {
+        setMounted(true);
+        window.scrollTo(0, 0);
         const supabase = getSupabase();
         supabase.auth.getUser().then(({ data: { user } }) => {
             setUser(user);
@@ -45,13 +49,24 @@ export default function AboutPage() {
         <div style={{ background: '#fffcfd', minHeight: '100vh' }}>
             <Header 
                 user={user}
-                cartCount={0} // About page doesn't have cart state in this file, but Header needs it. 
+                cartCount={0}
                 onLogout={handleLogout}
                 onLoginClick={() => router.push('/#login')}
                 onCartClick={() => router.push('/products')}
                 onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
                 categories={categories}
             />
+
+            {mounted && (
+                <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
+                    <nav className="mobile-nav">
+                        <a onClick={() => { router.push('/'); setMobileMenuOpen(false); }} className="mobile-nav-link" style={{ cursor: 'pointer' }}>Home</a>
+                        <a onClick={() => { router.push('/products'); setMobileMenuOpen(false); }} className="mobile-nav-link" style={{ cursor: 'pointer' }}>Shop</a>
+                        <a onClick={() => { router.push('/#collections'); setMobileMenuOpen(false); }} className="mobile-nav-link" style={{ cursor: 'pointer' }}>Collection</a>
+                        <a onClick={() => { setMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="mobile-nav-link" style={{ cursor: 'pointer' }}>Our Story</a>
+                    </nav>
+                </div>
+            )}
 
             <main style={{ paddingTop: '20px', paddingBottom: '60px' }}>
                 <div className="container" style={{ maxWidth: '900px' }}>
