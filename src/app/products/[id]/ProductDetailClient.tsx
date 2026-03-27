@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faShoppingBag, faTimes, faBars, faMagic, faUser, faSignOutAlt, faStar, faCreditCard, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { motion, useInView } from 'framer-motion';
+import { faSearch, faShoppingBag, faTimes, faBars, faMagic, faUser, faSignOutAlt, faStar, faCreditCard, faArrowLeft, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { getSupabase, isAdminEmail } from '@/lib/supabase';
 import dynamic from 'next/dynamic';
 const Header = dynamic(() => import('@/components/Header'), { ssr: false });
@@ -89,6 +89,8 @@ export default function ProductDetailClient({
     const [phoneNumber, setPhoneNumber] = useState('');
     const [authLoading, setAuthLoading] = useState(false);
     const [authError, setAuthError] = useState('');
+    const [activeSection, setActiveSection] = useState<string | null>('benefits');
+    const accordionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [categories, setCategories] = useState<Category[]>([]);
@@ -132,6 +134,33 @@ export default function ProductDetailClient({
             setAverageRating(5);
         }
     }, [initialProduct, initialRelatedProducts, initialReviews]);
+
+    useEffect(() => {
+        if (activeSection && accordionRefs.current[activeSection]) {
+            const el = accordionRefs.current[activeSection];
+            const rect = el?.getBoundingClientRect();
+            
+            if (rect) {
+                // Check if the section header is already visible below the fixed header (160px)
+                // and not cut off at the bottom
+                const headerHeight = 160; 
+                const isHeaderVisible = rect.top >= headerHeight && rect.top <= window.innerHeight - 100;
+                
+                if (!isHeaderVisible) {
+                    // Wait a tiny bit for the animation to start and layout to shift
+                    setTimeout(() => {
+                        const newRect = el?.getBoundingClientRect();
+                        if (newRect) {
+                            window.scrollTo({
+                                top: window.scrollY + newRect.top - headerHeight - 20, // 20px extra buffer
+                                behavior: 'smooth'
+                            });
+                        }
+                    }, 150);
+                }
+            }
+        }
+    }, [activeSection]);
 
     const loadCategories = async () => {
         const supabase = getSupabase();
@@ -274,6 +303,36 @@ export default function ProductDetailClient({
 
     const cartTotal = cart.reduce((sum, item) => sum + ((item as any).price || 0), 0);
 
+    const AccordionItem = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => {
+        const isActive = activeSection === id;
+        return (
+            <div 
+                className={`accordion-item ${isActive ? 'active' : ''}`}
+                ref={el => { accordionRefs.current[id] = el; }}
+            >
+                <button className="accordion-header" onClick={() => setActiveSection(isActive ? null : id)}>
+                    <span>{title}</span>
+                    <FontAwesomeIcon icon={faChevronDown} className="accordion-icon" />
+                </button>
+                <AnimatePresence>
+                    {isActive && (
+                        <motion.div 
+                            className="accordion-content"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        >
+                            <div className="accordion-inner">
+                                {children}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        );
+    };
+
     if (loading) return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-serif)' }}>Loading Product...</div>;
     if (!product) return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-serif)' }}>Product not found.</div>;
 
@@ -289,7 +348,7 @@ export default function ProductDetailClient({
                 categories={categories}
             />
 
-            <section style={{ padding: '20px 0' }}>
+            <section style={{ padding: '20px 0', marginTop: '1rem' }}>
                 <div className="container">
                     <div style={{ marginBottom: '2rem' }}>
                         <a 
@@ -345,9 +404,15 @@ export default function ProductDetailClient({
                                 </div>
 
                                 {product.short_benefit && (
-                                    <p style={{ fontSize: '1.1rem', color: '#555', marginBottom: '2rem', fontStyle: 'italic' }}>
+                                    <p style={{ fontSize: '1rem', color: '#888', marginBottom: '1rem', fontStyle: 'italic' }}>
                                         &quot;{product.short_benefit}&quot;
                                     </p>
+                                )}
+
+                                {product.description && (
+                                    <div style={{ fontSize: '1.05rem', color: '#555', marginBottom: '2rem', lineHeight: '1.7' }}>
+                                        {product.description}
+                                    </div>
                                 )}
 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2.5rem' }}>
@@ -377,54 +442,47 @@ export default function ProductDetailClient({
                                     )}
                                 </div>
 
-                                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem', background: '#f9f9f9', borderRadius: '8px' }}>
-                                    <p style={{ fontSize: '0.85rem', color: '#777', margin: 0 }}>Secure Payment</p>
-                                    <img src="/lankaQR.png" alt="LankaQR" style={{ height: '24px', objectFit: 'contain' }} />
-                                    <div style={{ display: 'flex', gap: '0.5rem', color: '#555', alignItems: 'center' }}>
-                                        <FontAwesomeIcon icon={faCreditCard} style={{ fontSize: '1.2rem' }} />
-                                        <span style={{ fontSize: '0.75rem' }}>Card</span>
+                                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem', background: '#f9f9f9', borderRadius: '8px' }}>
+                                        <p style={{ fontSize: '0.85rem', color: '#777', margin: 0 }}>Secure Payment</p>
+                                        <img src="/lankaQR.png" alt="LankaQR" style={{ height: '24px', objectFit: 'contain' }} />
+                                        <div style={{ display: 'flex', gap: '0.5rem', color: '#555', alignItems: 'center' }}>
+                                            <FontAwesomeIcon icon={faCreditCard} style={{ fontSize: '1.2rem' }} />
+                                            <span style={{ fontSize: '0.75rem' }}>Card</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Accordion Sections */}
+                                    <div className="pdp-accordions">
+                                        {product.benefits && (
+                                            <AccordionItem id="benefits" title="What does it do for you?">
+                                                <div style={{ marginTop: '0.5rem' }}>{product.benefits}</div>
+                                            </AccordionItem>
+                                        )}
+                                        
+                                        {product.ingredients && (
+                                            <AccordionItem id="ingredients" title="Ingredients">
+                                                {product.ingredients}
+                                            </AccordionItem>
+                                        )}
+                                        
+                                        {product.how_to_use && (
+                                            <AccordionItem id="usage" title="How to use">
+                                                {product.how_to_use}
+                                            </AccordionItem>
+                                        )}
+                                        
+                                        <AccordionItem id="delivery" title="Delivery & returns">
+                                            Standard delivery within 2-4 business days across Sri Lanka.
+                                            Returns accepted within 7 days for unopened and unused products.
+                                            Please refer to our full Return Policy for more details.
+                                        </AccordionItem>
                                     </div>
                                 </div>
-                            </div>
-                        </FadeIn>
-                    </div>
-
-                    {/* Detailed Content Sections */}
-                    <div style={{ marginTop: '5rem', display: 'flex', flexDirection: 'column', gap: '4rem' }}>
-                        <FadeIn>
-                            <div style={{ borderTop: '1px solid #eee', paddingTop: '4rem' }}>
-                                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', marginBottom: '1.5rem' }}>Product Description</h3>
-                                <p style={{ color: '#666', lineHeight: '1.8', fontSize: '1.05rem', whiteSpace: 'pre-line' }}>{product.description}</p>
-                            </div>
-                        </FadeIn>
-
-                        {product.benefits && (
-                            <FadeIn>
-                                <div>
-                                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', marginBottom: '1.5rem' }}>[KEY BENEFITS]</h3>
-                                    <div style={{ color: '#666', lineHeight: '1.8', fontSize: '1.05rem', whiteSpace: 'pre-line' }}>{product.benefits}</div>
-                                </div>
                             </FadeIn>
-                        )}
+                        </div>
 
-                        {product.how_to_use && (
-                            <FadeIn>
-                                <div>
-                                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', marginBottom: '1.5rem' }}>[HOW TO USE]</h3>
-                                    <div style={{ color: '#666', lineHeight: '1.8', fontSize: '1.05rem', whiteSpace: 'pre-line' }}>{product.how_to_use}</div>
-                                </div>
-                            </FadeIn>
-                        )}
-
-                        {product.ingredients && (
-                            <FadeIn>
-                                <div>
-                                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', marginBottom: '1.5rem' }}>[INGREDIENTS]</h3>
-                                    <div style={{ color: '#666', lineHeight: '1.8', fontSize: '1.05rem', whiteSpace: 'pre-line' }}>{product.ingredients}</div>
-                                </div>
-                            </FadeIn>
-                        )}
-
+                    {/* Customer Reviews Section */}
+                    <div style={{ marginTop: '3rem' }}>
                         <FadeIn>
                             <div style={{ borderTop: '1px solid #eee', paddingTop: '4rem' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>

@@ -35,12 +35,12 @@ body {
     background-color: var(--bg-color);
     line-height: 1.6;
     overflow-x: visible;
-    padding-top: 115px; /* Further reduced base padding for header */
+    padding-top: 160px; /* Adjusted for full fixed header (Announcement + Main + Subnav) */
 }
 
 @media (max-width: 992px) {
     body {
-        padding-top: 110px;
+        padding-top: 130px;
     }
 }
 
@@ -598,6 +598,58 @@ h1, h2, h3, h4 {
     margin-bottom: 0.6rem;
     font-family: var(--font-sans);
     font-weight: 500;
+}
+
+/* PDP Accordion Styles */
+.pdp-accordions {
+    margin-top: 2rem;
+    border-top: 1px solid #eee;
+}
+
+.accordion-item {
+    border-bottom: 1px solid #eee;
+}
+
+.accordion-header {
+    width: 100%;
+    padding: 1.2rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    transition: color 0.2s;
+}
+
+.accordion-header:hover {
+    color: var(--brand-green);
+}
+
+.accordion-icon {
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+    color: #888;
+}
+
+.accordion-item.active .accordion-icon {
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    overflow: hidden;
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.accordion-inner {
+    padding-bottom: 1.5rem;
+    white-space: pre-line;
 }
 
 .product-price {
