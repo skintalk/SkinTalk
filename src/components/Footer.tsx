@@ -28,6 +28,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const Footer = () => {
     const [activeAccordion, setActiveAccordion] = useState<string | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -45,6 +46,7 @@ const Footer = () => {
             }
         };
         fetchCategories();
+        setMounted(true);
     }, []);
 
     const toggleAccordion = (id: string) => {
@@ -188,15 +190,13 @@ const Footer = () => {
                                 <Link href="/sitemap">Site Map</Link>
                             </nav>
                         </div>
-                        <div className="bottom-v2-right">
-                            <div className="payment-icons-row">
-                                <img src="/lankaQR.png" alt="LankaQR" className="payment-logo" />
-                                <div className="card-logos">
-                                    <span className="card-logo">VISA</span>
-                                    <span className="card-logo">MASTERCARD</span>
-                                    <span className="card-logo">AMEX</span>
+                        <div className="bottom-v2-right" suppressHydrationWarning>
+                            {mounted && (
+                                <div className="payment-icons-row">
+                                    <span className="payment-label">Pay with</span>
+                                    <img src="/lankaQR.png" alt="LankaQR" className="payment-logo lankaqr-footer" />
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
                 </div>

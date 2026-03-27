@@ -9,8 +9,18 @@ export default function WhatsAppButton() {
     const [showTip, setShowTip] = useState(false);
 
     useEffect(() => {
-        const timer = setTimeout(() => setShowTip(true), 5000);
-        return () => clearTimeout(timer);
+        // Initial delay
+        const initialTimer = setTimeout(() => setShowTip(true), 3000);
+
+        // Interval to toggle tooltip visibility (in/out)
+        const interval = setInterval(() => {
+            setShowTip(prev => !prev);
+        }, 5000); // Toggles every 8 seconds
+
+        return () => {
+            clearTimeout(initialTimer);
+            clearInterval(interval);
+        };
     }, []);
 
     return (
