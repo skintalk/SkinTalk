@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library, config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import { faSearch, faShoppingBag, faTimes, faMagic, faBars } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faShoppingBag, faTimes, faMagic, faBars, faStar, faCreditCard, faTruck, faUndo, faShieldAlt } from '@fortawesome/free-solid-svg-icons';
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 
 // Prevent Font Awesome from adding its own CSS since we are importing it above
 config.autoAddCss = false;
 
-library.add(faSearch, faShoppingBag, faTimes, faMagic, faBars);
+library.add(faSearch, faShoppingBag, faTimes, faMagic, faBars, faWhatsapp, faStar, faCreditCard, faTruck, faUndo, faShieldAlt);
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://skintalk.lk'),
@@ -79,7 +81,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <WhatsAppButton />
+      </body>
     </html>
   );
 }

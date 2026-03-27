@@ -3,11 +3,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faShoppingBag, faTimes, faBars, faMagic, faUser, faSignOutAlt, faStar, faCreditCard, faArrowLeft, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faShoppingBag, faTimes, faBars, faMagic, faUser, faSignOutAlt, faStar, faCreditCard, faArrowLeft, faChevronDown, faShieldAlt, faTruck, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { getSupabase, isAdminEmail } from '@/lib/supabase';
 import Footer from '@/components/Footer';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 const Header = dynamic(() => import('@/components/Header'), { ssr: false });
 
 interface Category {
@@ -375,14 +376,15 @@ export default function ProductDetailClient({
                         {/* Left: Product Image Gallery */}
                         <FadeIn>
                             <div className="product-gallery">
-                                <motion.img 
-                                    src={product.image} 
-                                    alt={product.image_alt || product.name} 
-                                    style={{ width: '100%', maxHeight: '550px', objectFit: 'contain', borderRadius: '12px', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }}
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ duration: 0.5 }}
-                                />
+                                <div style={{ position: 'relative', width: '100%', height: '550px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }}>
+                                    <Image 
+                                        src={product.image} 
+                                        alt={product.image_alt || product.name} 
+                                        fill
+                                        style={{ objectFit: 'contain' }}
+                                        priority
+                                    />
+                                </div>
                             </div>
                         </FadeIn>
 
@@ -418,11 +420,23 @@ export default function ProductDetailClient({
                                     </div>
                                 )}
 
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '1.5rem' }}>
                                     {(!product.quantity || product.quantity <= 0) ? (
                                         <p style={{ color: '#d9534f', fontWeight: 'bold' }}>Out of Stock</p>
                                     ) : (
                                         <>
+                                            {/* Urgency Trigger */}
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                                                <motion.div 
+                                                    animate={{ opacity: [0.5, 1, 0.5] }} 
+                                                    transition={{ duration: 2, repeat: Infinity }}
+                                                    style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#d9534f' }} 
+                                                />
+                                                <span style={{ fontSize: '0.85rem', color: '#d9534f', fontWeight: '600' }}>
+                                                    {product.quantity < 10 ? `Only ${product.quantity} left in stock - selling fast!` : 'Popular choice - selling fast! 🔥'}
+                                                </span>
+                                            </div>
+
                                             <motion.button 
                                                 className="hero-cta" 
                                                 style={{ width: '100%', background: 'var(--brand-green)', color: '#fff', border: 'none' }}
@@ -445,12 +459,35 @@ export default function ProductDetailClient({
                                     )}
                                 </div>
 
-                                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem', background: '#f9f9f9', borderRadius: '8px' }}>
-                                        <p style={{ fontSize: '0.85rem', color: '#777', margin: 0 }}>Secure Payment</p>
-                                        <img src="/lankaQR.png" alt="LankaQR" style={{ height: '24px', objectFit: 'contain' }} />
-                                        <div style={{ display: 'flex', gap: '0.5rem', color: '#555', alignItems: 'center' }}>
-                                            <FontAwesomeIcon icon={faCreditCard} style={{ fontSize: '1.2rem' }} />
-                                            <span style={{ fontSize: '0.75rem' }}>Card</span>
+                                    {/* Enhanced Trust Badges Grid */}
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', padding: '1.2rem', background: '#fcfcfc', borderRadius: '12px', border: '1px solid #f0f0f0' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                            <FontAwesomeIcon icon={faShieldAlt} style={{ color: 'var(--brand-green)', fontSize: '1.2rem' }} />
+                                            <div>
+                                                <p style={{ fontSize: '0.75rem', fontWeight: 'bold', margin: 0 }}>Secure Payments</p>
+                                                <p style={{ fontSize: '0.65rem', color: '#888', margin: 0 }}>LankaQR & Card</p>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                            <FontAwesomeIcon icon={faStar} style={{ color: 'var(--brand-green)', fontSize: '1.2rem' }} />
+                                            <div>
+                                                <p style={{ fontSize: '0.75rem', fontWeight: 'bold', margin: 0 }}>Dermatological</p>
+                                                <p style={{ fontSize: '0.65rem', color: '#888', margin: 0 }}>Tested & Approved</p>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                            <FontAwesomeIcon icon={faTruck} style={{ color: 'var(--brand-green)', fontSize: '1.2rem' }} />
+                                            <div>
+                                                <p style={{ fontSize: '0.75rem', fontWeight: 'bold', margin: 0 }}>Fast Delivery</p>
+                                                <p style={{ fontSize: '0.65rem', color: '#888', margin: 0 }}>Island-wide 2-4 Days</p>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                                            <FontAwesomeIcon icon={faUndo} style={{ color: 'var(--brand-green)', fontSize: '1.2rem' }} />
+                                            <div>
+                                                <p style={{ fontSize: '0.75rem', fontWeight: 'bold', margin: 0 }}>7-Day Returns</p>
+                                                <p style={{ fontSize: '0.65rem', color: '#888', margin: 0 }}>Stress-free Shopping</p>
+                                            </div>
                                         </div>
                                     </div>
 

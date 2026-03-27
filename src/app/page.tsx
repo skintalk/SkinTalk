@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faShoppingBag, faTimes, faBars, faMagic, faUser, faSignOutAlt, faMapMarkerAlt, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faShoppingBag, faTimes, faBars, faMagic, faUser, faSignOutAlt, faMapMarkerAlt, faChevronLeft, faChevronRight, faStar, faShieldAlt, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { getSupabase, isAdminEmail, getAdminClient } from '@/lib/supabase';
 import Footer from '@/components/Footer';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 const Header = dynamic(() => import('@/components/Header'), { ssr: false });
 
 interface Product {
@@ -46,7 +47,15 @@ function ParallaxImage({ src, alt, className = '' }: { src: string; alt: string;
     const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
     return (
         <motion.div ref={ref} style={{ width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }} className={className}>
-            <motion.img src={src} alt={alt} style={{ y, width: '100%', height: '120%', objectFit: 'cover', top: '-10%', left: 0, position: 'absolute' }} />
+            <motion.div style={{ y, width: '100%', height: '120%', top: '-10%', left: 0, position: 'absolute' }}>
+                <Image 
+                    src={src} 
+                    alt={alt} 
+                    fill 
+                    style={{ objectFit: 'cover' }}
+                    priority 
+                />
+            </motion.div>
         </motion.div>
     );
 }
@@ -370,6 +379,7 @@ export default function Home() {
                 </div>
             </section>
 
+
             <section className="collections" id="collections">
                 <div className="container">
                     <FadeIn><h2 className="section-title">Product Categories</h2></FadeIn>
@@ -402,16 +412,17 @@ export default function Home() {
                         {products.map((product, index) => (
                             <FadeIn key={product.id} delay={index * 0.1}>
                                 <motion.div className="product-card" whileHover={{ y: -10 }} transition={{ duration: 0.3 }}>
-                                    <div className="product-image-container">
-                                        <img 
+                                    <div className="product-image-container" style={{ position: 'relative' }}>
+                                        <Image 
                                             src={product.image} 
                                             alt={product.name} 
-                                            className="product-img" 
+                                            fill
+                                            style={{ objectFit: 'cover', cursor: 'pointer' }}
                                             onClick={() => router.push(`/products/${product.slug || product.id}`)}
-                                            style={{ cursor: 'pointer' }}
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                         />
                                         {(!product.quantity || product.quantity <= 0) && (
-                                            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.85rem' }}>Out of Stock</div>
+                                            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.85rem', zIndex: 1 }}>Out of Stock</div>
                                         )}
                                     </div>
                                     <div className="product-info" style={{ cursor: 'pointer' }}>
@@ -430,6 +441,48 @@ export default function Home() {
                     <FadeIn delay={0.4}>
                         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
                             <button className="hero-cta" onClick={() => router.push('/products')}>See All Products</button>
+                        </div>
+                    </FadeIn>
+                </div>
+            </section>
+
+            {/* Trust Badges - Conversion Booster */}
+            <section style={{ padding: '3rem 1rem', background: '#fcfcfc', borderBottom: '1px solid #f0f0f0' }}>
+                <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '2rem', textAlign: 'center' }}>
+                    <FadeIn delay={0.1}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                            <FontAwesomeIcon icon={faShieldAlt} style={{ fontSize: '1.8rem', color: 'var(--brand-green)' }} />
+                            <div>
+                                <h3 style={{ fontSize: '0.95rem', fontWeight: 'bold', marginBottom: '0.2rem' }}>Secure Payments</h3>
+                                <p style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}>LankaQR & Card</p>
+                            </div>
+                        </div>
+                    </FadeIn>
+                    <FadeIn delay={0.2}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                            <FontAwesomeIcon icon={faStar} style={{ fontSize: '1.8rem', color: 'var(--brand-green)' }} />
+                            <div>
+                                <h3 style={{ fontSize: '0.95rem', fontWeight: 'bold', marginBottom: '0.2rem' }}>Dermatological</h3>
+                                <p style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}>Tested & Approved</p>
+                            </div>
+                        </div>
+                    </FadeIn>
+                    <FadeIn delay={0.3}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                            <FontAwesomeIcon icon={faTruck} style={{ fontSize: '1.8rem', color: 'var(--brand-green)' }} />
+                            <div>
+                                <h3 style={{ fontSize: '0.95rem', fontWeight: 'bold', marginBottom: '0.2rem' }}>Fast Shipping</h3>
+                                <p style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}>Island-wide 2-4 Days</p>
+                            </div>
+                        </div>
+                    </FadeIn>
+                    <FadeIn delay={0.4}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                            <FontAwesomeIcon icon={faMagic} style={{ fontSize: '1.8rem', color: 'var(--brand-green)' }} />
+                            <div>
+                                <h3 style={{ fontSize: '0.95rem', fontWeight: 'bold', marginBottom: '0.2rem' }}>Pure Formulas</h3>
+                                <p style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}>Botanical Ingredients</p>
+                            </div>
                         </div>
                     </FadeIn>
                 </div>

@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { getSupabase, isAdminEmail } from '@/lib/supabase';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 const Header = dynamic(() => import('@/components/Header'), { ssr: false });
 import Footer from '@/components/Footer';
 
@@ -261,16 +262,17 @@ function ProductsPageContent() {
                                     {groupedProducts[category].map((product, pIndex) => (
                                         <FadeIn key={product.id} delay={pIndex * 0.05}>
                                             <motion.div className="product-card" whileHover={{ y: -10 }} transition={{ duration: 0.3 }}>
-                                                <div className="product-image-container">
-                                                    <img 
+                                                <div className="product-image-container" style={{ position: 'relative' }}>
+                                                    <Image 
                                                         src={product.image} 
                                                         alt={product.name} 
-                                                        className="product-img" 
+                                                        fill
+                                                        style={{ objectFit: 'cover', cursor: 'pointer' }}
                                                         onClick={() => router.push(`/products/${product.slug || product.id}`)}
-                                                        style={{ cursor: 'pointer' }}
+                                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                                     />
                                                     {(!product.quantity || product.quantity <= 0) && (
-                                                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.85rem' }}>Out of Stock</div>
+                                                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'rgba(0,0,0,0.7)', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.85rem', zIndex: 1 }}>Out of Stock</div>
                                                     )}
                                                 </div>
                                                 <div className="product-info" style={{ cursor: 'pointer' }}>
