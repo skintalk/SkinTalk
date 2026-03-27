@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faShoppingBag, faTimes, faBars, faMagic, faUser, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faShoppingBag, faTimes, faBars, faMagic, faUser, faSignOutAlt, faMapMarkerAlt, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { getSupabase, isAdminEmail, getAdminClient } from '@/lib/supabase';
@@ -78,7 +78,7 @@ export default function Home() {
     const [checkoutLoading, setCheckoutLoading] = useState(false);
 
     useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 50);
+        const handleScroll = () => setScrolled(window.scrollY > 100);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
@@ -326,33 +326,69 @@ export default function Home() {
 
     return (
         <>
-            <motion.header className={`header ${scrolled ? 'scrolled' : ''}`} initial={{ y: -100 }} animate={{ y: 0 }} transition={{ duration: 0.6 }}>
-                <div className="container nav-content">
-                    <div className="logo">
-                        <img src="/logo.png" alt="SkinTalk" style={{ height: 120, objectFit: 'contain' }} />
+            <motion.header className={`header ${scrolled ? 'scrolled' : ''}`} initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+                <div className="announcement-bar">
+                    <span className="arrow arrow-left"><FontAwesomeIcon icon={faChevronLeft} /></span>
+                    <p>Free delivery on orders over LKR 5000</p>
+                    <span className="arrow arrow-right"><FontAwesomeIcon icon={faChevronRight} /></span>
+                </div>
+                
+                <div className="main-header">
+                    <div className="header-search">
+                        <input 
+                            type="text" 
+                            placeholder="SEARCH" 
+                            value={searchQuery} 
+                            onChange={(e) => setSearchQuery(e.target.value)} 
+                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()} 
+                        />
+                        <FontAwesomeIcon icon={faSearch} className="search-icon" />
                     </div>
-                    <nav className="nav-links">
-                        <a href="#home" className="nav-link">Home</a>
-                        <a href="#about" className="nav-link">Our Story</a>
-                        <a href="#shop" className="nav-link">Shop</a>
-                        <a href="#collections" className="nav-link">Collections</a>
-                    </nav>
-                    <div className="nav-actions">
-                        <div className="search-container">
-                            <input type="text" placeholder="Search products..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearch()} className="search-input" />
-                            <button className="icon-btn search-trigger" onClick={handleSearch}><FontAwesomeIcon icon={faSearch} /></button>
-                        </div>
+
+                    <div className="logo-container" onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
+                        <img src="/logo.png" alt="SkinTalk" className="logo-img" />
+                    </div>
+
+                    <div className="header-actions">
+                        <button className="header-action-btn" title="Location">
+                            <FontAwesomeIcon icon={faMapMarkerAlt} />
+                        </button>
                         {user ? (
-                            <button className="icon-btn" onClick={handleLogout} title="Logout"><FontAwesomeIcon icon={faSignOutAlt} /></button>
+                            <button className="header-action-btn" onClick={handleLogout} title="Logout">
+                                <FontAwesomeIcon icon={faSignOutAlt} />
+                            </button>
                         ) : (
-                            <button className="icon-btn" onClick={() => setAuthModalOpen(true)} title="Login"><FontAwesomeIcon icon={faUser} /></button>
+                            <button className="header-action-btn" onClick={() => setAuthModalOpen(true)} title="Login">
+                                <FontAwesomeIcon icon={faUser} />
+                            </button>
                         )}
-                        <button className="icon-btn cart-trigger" onClick={() => setCartOpen(true)}>
+                        <button className="header-action-btn cart-trigger" onClick={() => setCartOpen(true)} style={{ position: 'relative' }}>
                             <FontAwesomeIcon icon={faShoppingBag} />
                             {cart.length > 0 && <span className="cart-badge">{cart.length}</span>}
                         </button>
-                        <button className="icon-btn mobile-menu-trigger" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}><FontAwesomeIcon icon={faBars} /></button>
+                        <button className="header-action-btn mobile-menu-trigger" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                            <FontAwesomeIcon icon={faBars} />
+                        </button>
                     </div>
+                </div>
+
+                <div className="sub-header">
+                    <nav className="cat-nav">
+                        <ul className="cat-nav-links">
+                            <li><a href="#home" className="cat-nav-link">Home</a></li>
+                            {categories.map((cat) => (
+                                <li key={cat.id}>
+                                    <a 
+                                        href={`/products?category=${cat.name}`} 
+                                        className="cat-nav-link"
+                                    >
+                                        {cat.name}
+                                    </a>
+                                </li>
+                            ))}
+                            <li><a href="/about" className="cat-nav-link">About Us</a></li>
+                        </ul>
+                    </nav>
                 </div>
             </motion.header>
 
