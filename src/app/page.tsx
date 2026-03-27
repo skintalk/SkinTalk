@@ -375,7 +375,19 @@ export default function Home() {
                     <div className="hero-content">
                         <FadeIn><p className="hero-subtitle">Premium Skincare</p></FadeIn>
                         <FadeIn delay={0.1}><h1 className="hero-title">Radiate<br />Confidence</h1></FadeIn>
-                        <FadeIn delay={0.2}><p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '2.5rem', maxWidth: 450 }}>Experience the perfect blend of minimalist design and pure ingredients. Discover your glow with SkinTalk. Launch Offer get 10% discount on every QR payment</p></FadeIn>
+                        <FadeIn delay={0.2}>
+                            <motion.div 
+                                className="offer-badge"
+                                animate={{ scale: [1, 1.03, 1] }}
+                                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                            >
+                                <FontAwesomeIcon icon={faShieldAlt} style={{ marginRight: '8px', fontSize: '0.8rem' }} />
+                                <span>Launch Offer: Get 10% discount on first QR payment</span>
+                            </motion.div>
+                            <p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '2.5rem', maxWidth: 450 }}>
+                                Experience the perfect blend of minimalist design and pure ingredients. Discover your glow with SkinTalk.
+                            </p>
+                        </FadeIn>
                         <FadeIn delay={0.3}><a href="#shop" className="hero-cta">Shop Now</a></FadeIn>
                     </div>
                     <div className="hero-image-pane"><ParallaxImage src="/skintalk-hero.png" alt="Lady holding SkinTalk product" className="hero-img" /></div>
