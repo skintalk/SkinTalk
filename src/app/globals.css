@@ -1628,10 +1628,22 @@ h1, h2, h3, h4 {
 }
 
 /* Admin Layout */
+/* Reset body padding for admin specifically */
+body.admin-page-body {
+    padding-top: 0 !important;
+}
+
 .admin-layout {
     display: flex;
     min-height: 100vh;
     background: #f8f9fa;
+    position: relative;
+    z-index: 1;
+}
+
+/* Reset body padding when in admin layout */
+body:has(.admin-layout) {
+    padding-top: 0 !important;
 }
 
 .admin-sidebar {
@@ -1641,6 +1653,8 @@ h1, h2, h3, h4 {
     display: flex;
     flex-direction: column;
     position: fixed;
+    top: 0;
+    left: 0;
     height: 100vh;
     z-index: 1000;
     transition: transform 0.3s ease;

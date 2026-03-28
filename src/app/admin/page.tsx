@@ -148,6 +148,11 @@ export default function AdminPage() {
     const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
     const [isAddProductExpanded, setIsAddProductExpanded] = useState(false);
     const [qrLoading, setQrLoading] = useState(false);
+
+    useEffect(() => {
+        document.body.classList.add('admin-page-body');
+        return () => document.body.classList.remove('admin-page-body');
+    }, []);
     const [qrError, setQrError] = useState('');
     const [qrResult, setQrResult] = useState<any>(null);
     const [savedMerchants, setSavedMerchants] = useState<any[]>([]);
