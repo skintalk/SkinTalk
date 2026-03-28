@@ -431,11 +431,11 @@ export default function ProductDetailClient({
                             <FontAwesomeIcon icon={faArrowLeft} /> Back to Shop
                         </a>
                     </div>
-                    <div className="pdp-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem' }}>
+                    <div className="pdp-grid">
                         {/* Left: Product Image Gallery */}
                         <FadeIn>
                             <div className="product-gallery">
-                                <div style={{ position: 'relative', width: '100%', height: '650px', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.05)' }}>
+                                <div className="product-image-wrapper">
                                     <Image 
                                         src={product.image} 
                                         alt={product.image_alt || product.name} 
@@ -447,11 +447,108 @@ export default function ProductDetailClient({
                             </div>
                         </FadeIn>
 
+                        <style jsx global>{`
+                            .pdp-grid {
+                                display: grid;
+                                grid-template-columns: 1.2fr 1fr;
+                                gap: 4rem;
+                            }
+                            .product-image-wrapper {
+                                position: relative;
+                                width: 100%;
+                                height: 600px;
+                                border-radius: 12px;
+                                overflow: hidden;
+                                box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+                            }
+                            @media (max-width: 968px) {
+                                .pdp-grid {
+                                    grid-template-columns: 1fr;
+                                    gap: 1.5rem;
+                                }
+                                .product-image-wrapper {
+                                    height: 350px;
+                                }
+                                .product-details {
+                                    display: flex;
+                                    flex-direction: column;
+                                    align-items: flex-start;
+                                    text-align: left;
+                                    padding-bottom: 2rem;
+                                }
+                                .product-details > div, 
+                                .product-details > p,
+                                .accordion-inner {
+                                    text-align: justify;
+                                    text-justify: inter-word;
+                                    hyphens: auto;
+                                    width: 100%;
+                                }
+                                .product-details h1 {
+                                    font-size: 2rem !important;
+                                    text-align: left;
+                                }
+                                .product-details .product-price-row {
+                                    justify-content: flex-start;
+                                }
+                                .urgency-trigger {
+                                    display: flex;
+                                    justify-content: flex-start;
+                                    width: 100%;
+                                }
+                                .reviews-summary {
+                                    flex-direction: column;
+                                    align-items: flex-start !important;
+                                    gap: 1.5rem;
+                                }
+                                .reviews-summary h3 {
+                                    font-size: 1.8rem !important;
+                                }
+                                .reviews-summary > div {
+                                    text-align: left !important;
+                                }
+                                .reviews-grid {
+                                    grid-template-columns: 1fr !important;
+                                    gap: 2rem !important;
+                                }
+                                .reviews-grid > div {
+                                    position: static !important;
+                                }
+                                .reviews-section {
+                                    margin-top: 1rem !important;
+                                }
+                                .reviews-section-inner {
+                                    padding-top: 2rem !important;
+                                }
+                                .product-details {
+                                    padding-bottom: 1rem !important;
+                                }
+                            }
+                            .reviews-section {
+                                margin-top: 3rem;
+                            }
+                            .reviews-section-inner {
+                                border-top: 1px solid #eee;
+                                padding-top: 4rem;
+                            }
+                            .reviews-summary {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                margin-bottom: 3rem;
+                            }
+                            .reviews-grid {
+                                display: grid;
+                                grid-template-columns: 1fr 2fr;
+                                gap: 4rem;
+                            }
+                        `}</style>
+
                         {/* Right: Product Info */}
                         <FadeIn delay={0.2}>
                             <div className="product-details">
                                 <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.5rem', marginBottom: '0.5rem', color: 'var(--text-main)' }}>{product.name}</h1>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                                <div className="product-price-row" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
                                     <h2 style={{ fontSize: '1.8rem', fontWeight: '500', color: 'var(--text-main)' }}>LKR {product.price.toFixed(2)}</h2>
                                     <div style={{ color: '#FFD700', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <div style={{ display: 'flex', gap: '2px' }}>
@@ -478,7 +575,6 @@ export default function ProductDetailClient({
                                         {product.description}
                                     </div>
                                 )}
-
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '1.5rem' }}>
                                     {(!product.quantity || product.quantity <= 0) ? (
                                         <p style={{ color: '#d9534f', fontWeight: 'bold' }}>Out of Stock</p>
@@ -486,7 +582,7 @@ export default function ProductDetailClient({
                                         <>
                                             {/* Urgency Trigger */}
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '0.5rem' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                <div className="urgency-trigger" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                                     <motion.div 
                                                         animate={{ opacity: [0.5, 1, 0.5] }} 
                                                         transition={{ duration: 2, repeat: Infinity }}
@@ -499,7 +595,7 @@ export default function ProductDetailClient({
                                                 
                                                 {/* Social Proof: Real-Time Activity from Database */}
                                                 {buyersToday > 0 && (
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(0, 66, 54, 0.03)', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(0, 66, 54, 0.05)' }}>
+                                                    <div className="urgency-trigger" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(0, 66, 54, 0.03)', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(0, 66, 54, 0.05)' }}>
                                                         <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e' }} />
                                                             <motion.div 
@@ -600,10 +696,10 @@ export default function ProductDetailClient({
                         </div>
 
                     {/* Customer Reviews Section */}
-                    <div style={{ marginTop: '3rem' }}>
+                    <div className="reviews-section">
                         <FadeIn>
-                            <div style={{ borderTop: '1px solid #eee', paddingTop: '4rem' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+                            <div className="reviews-section-inner">
+                                <div className="reviews-summary">
                                     <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem' }}>Customer Reviews</h3>
                                     <div style={{ textAlign: 'right' }}>
                                         <div style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>{averageRating}</div>
@@ -616,7 +712,7 @@ export default function ProductDetailClient({
                                     </div>
                                 </div>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '4rem' }}>
+                                <div className="reviews-grid">
                                     {/* Write a Review Form */}
                                     <div style={{ position: 'sticky', top: '100px', alignSelf: 'start', background: '#fff', padding: '2rem', borderRadius: '12px', border: '1px solid #f0f0f0' }}>
                                         <h4 style={{ fontSize: '1.2rem', marginBottom: '1.5rem' }}>Write a Review</h4>
@@ -749,18 +845,6 @@ export default function ProductDetailClient({
                     </div>
                 </div>
             )}
-            
-            <style jsx global>{`
-                .pdp-grid {
-                    grid-template-columns: 1.2fr 1fr;
-                }
-                @media (max-width: 968px) {
-                    .pdp-grid {
-                        grid-template-columns: 1fr;
-                        gap: 2rem;
-                    }
-                }
-            `}</style>
         </div>
     );
 }

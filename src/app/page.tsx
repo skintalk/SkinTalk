@@ -384,9 +384,9 @@ export default function Home() {
                                 <FontAwesomeIcon icon={faShieldAlt} style={{ marginRight: '8px', fontSize: '0.8rem' }} />
                                 <span>Launch Offer: Get 10% discount on first QR payment</span>
                             </motion.div>
-                            <p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '2.5rem', maxWidth: 450 }}>
-                                Experience the perfect blend of minimalist design and pure ingredients. Discover your glow with SkinTalk.
-                            </p>
+                             <p className="hero-description" style={{ fontSize: '1.1rem', color: '#666' }}>
+                                 Experience the perfect blend of minimalist design and pure ingredients. Discover your glow with SkinTalk.
+                             </p>
                         </FadeIn>
                         <FadeIn delay={0.3}><a href="#shop" className="hero-cta">Shop Now</a></FadeIn>
                     </div>

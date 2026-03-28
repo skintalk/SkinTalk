@@ -50,6 +50,15 @@ export default function Header({ user, cartCount, onLogout, onLoginClick, onCart
             </div>
             
             <div className="main-header">
+                <div className="header-mobile-left">
+                    <button className="header-action-btn mobile-menu-trigger" onClick={onMobileMenuToggle}>
+                        <FontAwesomeIcon icon={faBars} />
+                    </button>
+                    <button className="header-action-btn mobile-search-btn" onClick={() => router.push('/products')}>
+                        <FontAwesomeIcon icon={faSearch} />
+                    </button>
+                </div>
+
                 <div className="header-search">
                     <input 
                         type="text" 
@@ -66,22 +75,21 @@ export default function Header({ user, cartCount, onLogout, onLoginClick, onCart
                 </Link>
 
                 <div className="header-actions">
-                    {user ? (
-                        <button className="header-action-btn" onClick={onLogout} title="Logout">
-                            <FontAwesomeIcon icon={faSignOutAlt} />
+                    <div className="header-actions-group">
+                        {user ? (
+                            <button className="header-action-btn" onClick={onLogout} title="Logout">
+                                <FontAwesomeIcon icon={faSignOutAlt} />
+                            </button>
+                        ) : (
+                            <button className="header-action-btn" onClick={onLoginClick} title="Login">
+                                <FontAwesomeIcon icon={faUser} />
+                            </button>
+                        )}
+                        <button className="header-action-btn cart-trigger" onClick={onCartClick} style={{ position: 'relative' }}>
+                            <FontAwesomeIcon icon={faShoppingCart} />
+                            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
                         </button>
-                    ) : (
-                        <button className="header-action-btn" onClick={onLoginClick} title="Login">
-                            <FontAwesomeIcon icon={faUser} />
-                        </button>
-                    )}
-                    <button className="header-action-btn cart-trigger" onClick={onCartClick} style={{ position: 'relative' }}>
-                        <FontAwesomeIcon icon={faShoppingCart} />
-                        {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
-                    </button>
-                    <button className="header-action-btn mobile-menu-trigger" onClick={onMobileMenuToggle}>
-                        <FontAwesomeIcon icon={faBars} />
-                    </button>
+                    </div>
                 </div>
             </div>
 
