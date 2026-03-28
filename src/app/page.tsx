@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faShoppingBag, faTimes, faBars, faMagic, faUser, faSignOutAlt, faMapMarkerAlt, faChevronLeft, faChevronRight, faStar, faShieldAlt, faTruck } from '@fortawesome/free-solid-svg-icons';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { getSupabase, isAdminEmail, getAdminClient } from '@/lib/supabase';
 import Footer from '@/components/Footer';
 import dynamic from 'next/dynamic';
@@ -362,10 +363,25 @@ export default function Home() {
             {mounted && (
                 <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
                     <nav className="mobile-nav">
-                        <a href="#home" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Home</a>
-                        <a href="/products" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Shop</a>
-                        <a href="#collections" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Collection</a>
-                        <a href="#about" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Our Story</a>
+                        <Link href="/" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+                        <Link href="/about" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Our Story</Link>
+                        <Link href="/products" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Shop</Link>
+                        <Link href="/#collections" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Collection</Link>
+                        
+                        {/* Dynamic Categories */}
+                        {categories.map((cat) => (
+                            <Link 
+                                key={cat.id} 
+                                href={`/products?category=${encodeURIComponent(cat.name)}`} 
+                                className="mobile-nav-link" 
+                                onClick={() => setMobileMenuOpen(false)}
+                                style={{ fontSize: '0.85rem', color: '#888' }}
+                            >
+                                {cat.name}
+                            </Link>
+                        ))}
+                        
+                        <Link href="/#about" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>About Us</Link>
                     </nav>
                 </div>
             )}
