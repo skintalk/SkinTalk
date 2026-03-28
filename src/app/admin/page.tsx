@@ -779,6 +779,10 @@ export default function AdminPage() {
                                             <input type="text" placeholder="Product Name" value={newProductName} onChange={(e) => setNewProductName(e.target.value)} />
                                         </div>
                                         <div className="form-group">
+                                            <label>Item Code</label>
+                                            <input type="text" placeholder="Item Code" value={newProductItemCode} onChange={(e) => setNewProductItemCode(e.target.value)} />
+                                        </div>
+                                        <div className="form-group">
                                             <label>Price (LKR)</label>
                                             <input type="number" placeholder="Price" value={newProductPrice} onChange={(e) => setNewProductPrice(e.target.value)} />
                                         </div>
@@ -788,19 +792,133 @@ export default function AdminPage() {
                                         </div>
                                         <div className="form-group">
                                             <label>Category</label>
-                                            <select value={newProductCategory} onChange={(e) => setNewProductCategory(e.target.value)}>
-                                                <option value="">Select Category</option>
-                                                {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-                                            </select>
+                                            <div className="custom-select-wrapper">
+                                                <div 
+                                                    className={`admin-form-custom-select-trigger ${isCategoryDropdownOpen ? 'open' : ''}`}
+                                                    onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                                                >
+                                                    {newProductCategory || 'Select Category'}
+                                                </div>
+                                                {isCategoryDropdownOpen && (
+                                                    <div className="custom-select-dropdown">
+                                                        <div 
+                                                            className="custom-select-option"
+                                                            onClick={() => {
+                                                                setNewProductCategory('');
+                                                                setIsCategoryDropdownOpen(false);
+                                                            }}
+                                                        >
+                                                            Select Category
+                                                        </div>
+                                                        {categories.map(cat => (
+                                                            <div 
+                                                                key={cat.id}
+                                                                className="custom-select-option"
+                                                                onClick={() => {
+                                                                    setNewProductCategory(cat.name);
+                                                                    setIsCategoryDropdownOpen(false);
+                                                                }}
+                                                            >
+                                                                {cat.name}
+                                                            </div>
+                                                        ))}
+                                                        <div 
+                                                            className="custom-select-option add-new"
+                                                            onClick={() => {
+                                                                setShowAddCategory(true);
+                                                                setIsCategoryDropdownOpen(false);
+                                                            }}
+                                                        >
+                                                            + Add new category
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Product Image</label>
+                                            <div className="file-input-wrapper">
+                                                <label>
+                                                    <FontAwesomeIcon icon={faImage} /> 
+                                                    {newProductImageName ? newProductImageName : 'Upload Image'}
+                                                </label>
+                                                <input type="file" accept="image/*" onChange={(e) => { setNewProductImage(e.target.files?.[0] || null); setNewProductImageName(e.target.files?.[0]?.name || ''); }} />
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="form-group" style={{ marginTop: '1rem' }}>
-                                        <label>Description</label>
-                                        <textarea placeholder="Description" value={newProductDescription} onChange={(e) => setNewProductDescription(e.target.value)} rows={3} />
+                                    <div style={{ marginTop: '1rem' }}>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '1rem' }}>
+                                            <div style={{ gridColumn: 'span 12' }}>
+                                                <label>Description</label>
+                                                <textarea placeholder="Product Description" value={newProductDescription} onChange={(e) => setNewProductDescription(e.target.value)} rows={4} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd' }} />
+                                            </div>
+                                            <div style={{ gridColumn: 'span 12' }}>
+                                                <label>Short Benefit (e.g. Clears acne)</label>
+                                                <textarea placeholder="Briefly explain the main benefit" value={newProductShortBenefit} onChange={(e) => setNewProductShortBenefit(e.target.value)} rows={2} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd' }} />
+                                            </div>
+                                            <div style={{ gridColumn: 'span 6' }}>
+                                                <label>Key Benefits (List them...)</label>
+                                                <textarea placeholder="List beneficial properties" value={newProductBenefits} onChange={(e) => setNewProductBenefits(e.target.value)} rows={4} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd' }} />
+                                            </div>
+                                            <div style={{ gridColumn: 'span 6' }}>
+                                                <label>How to Use (Step 1, Step 2...)</label>
+                                                <textarea placeholder="Instructions for use" value={newProductHowToUse} onChange={(e) => setNewProductHowToUse(e.target.value)} rows={4} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd' }} />
+                                            </div>
+                                            <div style={{ gridColumn: 'span 12' }}>
+                                                <label>Ingredients</label>
+                                                <textarea placeholder="List ingredients" value={newProductIngredients} onChange={(e) => setNewProductIngredients(e.target.value)} rows={3} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd' }} />
+                                            </div>
+
+                                            {/* SEO & metadata section */}
+                                            <div style={{ gridColumn: 'span 12', marginTop: '1.5rem', borderTop: '1px solid #eee', paddingTop: '1.5rem' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                                    <h4 style={{ margin: 0, color: '#444' }}>SEO & WEB METADATA</h4>
+                                                    <button 
+                                                        type="button" 
+                                                        className="admin-btn secondary" 
+                                                        onClick={generateSEOData} 
+                                                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                                                    >
+                                                        ✨ Auto-generate SEO
+                                                    </button>
+                                                </div>
+                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '1rem' }}>
+                                                    <div style={{ gridColumn: 'span 3' }}>
+                                                        <label>Search Engine Friendly URL (Slug)</label>
+                                                        <input type="text" placeholder="e.g. herbal-face-wash" value={newProductSlug} onChange={(e) => setNewProductSlug(e.target.value)} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd' }} />
+                                                    </div>
+                                                    <div style={{ gridColumn: 'span 3' }}>
+                                                        <label>Product SKU</label>
+                                                        <input type="text" placeholder="SKU001" value={newProductSKU} onChange={(e) => setNewProductSKU(e.target.value)} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd' }} />
+                                                    </div>
+                                                    <div style={{ gridColumn: 'span 3' }}>
+                                                        <label>Meta Title</label>
+                                                        <input type="text" placeholder="Google search title" value={newProductMetaTitle} onChange={(e) => setNewProductMetaTitle(e.target.value)} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd' }} />
+                                                    </div>
+                                                    <div style={{ gridColumn: 'span 3' }}>
+                                                        <label>Image Accessibility Text (Alt)</label>
+                                                        <input type="text" placeholder="Description for screen readers" value={newProductImageAlt} onChange={(e) => setNewProductImageAlt(e.target.value)} style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd' }} />
+                                                    </div>
+                                                    <div style={{ gridColumn: 'span 6' }}>
+                                                        <label>Meta Description</label>
+                                                        <textarea 
+                                                            placeholder="Brief summary for search results" 
+                                                            value={newProductMetaDescription} 
+                                                            onChange={(e) => setNewProductMetaDescription(e.target.value)}
+                                                            rows={2}
+                                                            style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', border: '1px solid #ddd' }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-                                        <button className="admin-btn primary" onClick={handleSaveProduct}>{editingProduct ? 'Update Product' : 'Add Product'}</button>
-                                        {editingProduct && <button className="admin-btn secondary" onClick={() => { setEditingProduct(null); setIsAddProductExpanded(false); }}>Cancel</button>}
+
+                                    <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', borderTop: '1px solid #eee', paddingTop: '1.5rem' }}>
+                                        <button className="admin-btn primary" onClick={handleSaveProduct} disabled={uploading}>
+                                            {uploading ? (editingProduct ? 'Updating...' : 'Adding...') : (editingProduct ? 'Update Product' : 'Add Product')}
+                                        </button>
+                                        <button className="admin-btn secondary" onClick={resetForm}>Cancel</button>
                                     </div>
                                 </div>
                             )}
@@ -837,6 +955,61 @@ export default function AdminPage() {
                                 </tbody>
                             </table>
                         </div>
+
+                        {showAddCategory && (
+                            <div className="admin-modal-overlay">
+                                <div className="admin-modal">
+                                    <div className="admin-modal-header">
+                                        <h3>Add New Category</h3>
+                                        <button className="close-btn" onClick={() => { setShowAddCategory(false); setNewCategoryName(''); setNewCategoryImage(null); setNewCategoryImageName(''); }}>
+                                            <FontAwesomeIcon icon={faTimes} />
+                                        </button>
+                                    </div>
+                                    <div className="admin-modal-body">
+                                        <div className="admin-form-group">
+                                            <label>Category Name</label>
+                                            <input 
+                                                type="text" 
+                                                placeholder="Enter category name" 
+                                                value={newCategoryName} 
+                                                onChange={(e) => setNewCategoryName(e.target.value)}
+                                                autoFocus
+                                            />
+                                        </div>
+                                        <div className="admin-form-group">
+                                            <label>Category Image</label>
+                                            <div className="file-input-wrapper">
+                                                <label>
+                                                    <FontAwesomeIcon icon={faImage} /> 
+                                                    {newCategoryImageName ? newCategoryImageName : 'Upload Category Image'}
+                                                </label>
+                                                <input 
+                                                    type="file" 
+                                                    accept="image/*" 
+                                                    onChange={(e) => { 
+                                                        setNewCategoryImage(e.target.files?.[0] || null); 
+                                                        setNewCategoryImageName(e.target.files?.[0]?.name || ''); 
+                                                    }} 
+                                                />
+                                            </div>
+                                            {newCategoryImage && (
+                                                <div style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#666' }}>
+                                                    Selected: {newCategoryImageName}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="admin-modal-footer">
+                                        <button className="admin-btn" onClick={() => { setShowAddCategory(false); setNewCategoryName(''); setNewCategoryImage(null); setNewCategoryImageName(''); }} style={{ background: '#eee', color: '#333' }}>
+                                            Cancel
+                                        </button>
+                                        <button className="admin-btn primary" onClick={handleAddCategory} disabled={uploading}>
+                                            {uploading ? 'Adding...' : 'Add Category'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </motion.div>
                 )}
 

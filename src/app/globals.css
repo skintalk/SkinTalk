@@ -1804,9 +1804,21 @@ h1, h2, h3, h4 {
 
 .admin-form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(6, 1fr);
     gap: 1rem;
     margin-bottom: 1rem;
+}
+
+@media (max-width: 1200px) {
+    .admin-form-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-form-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .admin-form-grid input,
@@ -1870,7 +1882,7 @@ h1, h2, h3, h4 {
     cursor: pointer;
     font-weight: 500;
     transition: var(--transition);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e886a3' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23004236' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 1rem center;
     background-size: 12px;
@@ -1878,9 +1890,9 @@ h1, h2, h3, h4 {
 
 .admin-form-custom-select-trigger:hover,
 .admin-form-custom-select-trigger.open {
-    border-color: var(--accent);
-    background-color: var(--secondary-bg);
-    box-shadow: 0 0 0 3px rgba(232, 134, 163, 0.15);
+    border-color: var(--brand-green);
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(0, 66, 54, 0.05);
 }
 
 .custom-select-dropdown {
@@ -1913,8 +1925,8 @@ h1, h2, h3, h4 {
 }
 
 .custom-select-option:hover {
-    background-color: var(--secondary-bg);
-    color: var(--accent);
+    background-color: var(--brand-green);
+    color: #fff;
 }
 
 .custom-select-option.add-new {
