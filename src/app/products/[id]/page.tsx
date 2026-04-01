@@ -2,30 +2,29 @@ import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { getSupabase } from '@/lib/supabase';
 import ProductDetailClient from './ProductDetailClient';
+import { cache } from 'react';
 
 interface Props {
   params: { id: string };
 }
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// Remove force-dynamic to enable caching, but keep a reasonable revalidation
+export const revalidate = 3600; // Revalidate every hour
 
-
-async function getProductBySlugOrId(slugOrId: string) {
+// Cache the product fetch to deduplicate between generateMetadata and the Page component
+const getProductBySlugOrId = cache(async (slugOrId: string) => {
   const supabase = getSupabase();
   
-
   // 1. Try exact slug
-  let { data, error } = await supabase
+  let { data } = await supabase
     .from('products')
     .select('*')
     .ilike('slug', slugOrId)
     .maybeSingle();
   
-
   // 2. Try with leading slash if not found
   if (!data) {
-    const { data: slashData, error: slashError } = await supabase
+    const { data: slashData } = await supabase
       .from('products')
       .select('*')
       .ilike('slug', `/${slugOrId}`)
@@ -35,18 +34,17 @@ async function getProductBySlugOrId(slugOrId: string) {
 
   // 3. Try fallback search if still not found
   if (!data) {
-      const { data: searchData, error: searchError } = await supabase
+      const { data: searchData } = await supabase
         .from('products')
         .select('name, slug')
         .ilike('slug', `%${slugOrId}%`);
       if (searchData && searchData.length > 0) {
-          // Use the first one
           const { data: fullData } = await supabase.from('products').select('*').eq('slug', searchData[0].slug).single();
           data = fullData;
       }
   }
   return data;
-}
+});
 
 async function getRelatedProducts(category: string, excludeId: string) {
   const supabase = getSupabase();
@@ -69,6 +67,12 @@ async function getReviews(productId: string) {
   return data || [];
 }
 
+async function getCategories() {
+    const supabase = getSupabase();
+    const { data } = await supabase.from('categories').select('*').order('name');
+    return data || [];
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id: slugOrId } = await params;
   const product = await getProductBySlugOrId(slugOrId);
@@ -79,11 +83,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  // If we found it by ID but it has a slug, use the slug for metadata URL
   const productSlug = product.slug || product.id;
   const title = product.meta_title || `${product.name} | SkinTalk`;
   const description = product.meta_description || product.description?.substring(0, 160);
-  const url = `https://skintalk.lk/products/${productSlug}`;
+  const url = `https://skintalks.lk/products/${productSlug}`;
 
   return {
     title,
@@ -125,9 +128,11 @@ export default async function ProductPage({ params }: Props) {
     redirect(`/products/${product.slug}`);
   }
 
-  const [relatedProducts, reviews] = await Promise.all([
+  // Parallelize remaining fetches
+  const [relatedProducts, reviews, categories] = await Promise.all([
     getRelatedProducts(product.category, product.id),
-    getReviews(product.id)
+    getReviews(product.id),
+    getCategories()
   ]);
 
   const jsonLd = {
@@ -143,7 +148,7 @@ export default async function ProductPage({ params }: Props) {
     },
     offers: {
       '@type': 'Offer',
-      url: `https://skintalk.lk/products/${product.slug || product.id}`,
+      url: `https://skintalks.lk/products/${product.slug || product.id}`,
       priceCurrency: 'LKR',
       price: product.price,
       availability: product.quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
@@ -165,6 +170,7 @@ export default async function ProductPage({ params }: Props) {
         initialProduct={product} 
         initialRelatedProducts={relatedProducts}
         initialReviews={reviews}
+        serverCategories={categories}
       />
     </>
   );

@@ -147,6 +147,7 @@ export async function POST(request: NextRequest) {
                         body: JSON.stringify({
                             amount: total.toFixed(2),
                             reference_number: invoiceNumber || order.id.toString(),
+                            callback_url: 'https://www.skintalks.lk/api/webhooks/verify-payment'
                         })
                     });
                     const qrData: any = await qrResponse.json();

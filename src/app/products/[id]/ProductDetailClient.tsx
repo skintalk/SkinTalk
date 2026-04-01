@@ -65,11 +65,13 @@ function FadeIn({ children, delay = 0, className = '' }: { children: React.React
 export default function ProductDetailClient({ 
     initialProduct, 
     initialRelatedProducts, 
-    initialReviews 
+    initialReviews,
+    serverCategories
 }: { 
     initialProduct: Product; 
     initialRelatedProducts: Product[]; 
     initialReviews: Review[];
+    serverCategories?: Category[];
 }) {
     const { id } = useParams();
     const productId = initialProduct.id;
@@ -95,7 +97,7 @@ export default function ProductDetailClient({
     const accordionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [categories, setCategories] = useState<Category[]>([]);
+    const [categories, setCategories] = useState<Category[]>(serverCategories || []);
     const [mounted, setMounted] = useState(false);
 
     // Review States
@@ -170,7 +172,9 @@ export default function ProductDetailClient({
             setIsAdmin(isAdminEmail(session?.user?.email));
             if (session?.user) loadCartFromDb(session.user.id);
         });
-        loadCategories();
+        if (!serverCategories) {
+            loadCategories();
+        }
         loadSalesActivity(); // Load real sales data on mount
         return () => subscription.unsubscribe();
     }, []);
