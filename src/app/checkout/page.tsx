@@ -81,6 +81,20 @@ export default function CheckoutPage() {
             return;
         }
         setUser(user);
+        
+        // Fetch last order's shipping address
+        const { data: lastOrder } = await supabase
+            .from('orders')
+            .select('shipping_address')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+        if (lastOrder?.shipping_address) {
+            setAddress(lastOrder.shipping_address as Address);
+        }
+
         await loadCart(user.id);
         setInitialLoading(false);
     };
