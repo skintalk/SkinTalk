@@ -281,8 +281,11 @@ export default function AdminPage() {
         router.push('/');
     };
 
+    const [currentQrPayload, setCurrentQrPayload] = useState('');
+
     const parseQR = async (qrString: string) => {
         try {
+            setCurrentQrPayload(qrString);
             const response = await fetch('/api/parse-qr', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1144,11 +1147,21 @@ export default function AdminPage() {
                                                 const res = await fetch('/api/admin', {
                                                     method: 'POST',
                                                     headers: { 'Content-Type': 'application/json' },
-                                                    body: JSON.stringify({ action: 'save_merchant', data: qrResult, userEmail: user.email })
+                                                    body: JSON.stringify({ 
+                                                        action: 'save_merchant', 
+                                                        data: {
+                                                            merchant_name: qrResult.merchant_name,
+                                                            merchant_city: qrResult.merchant_city,
+                                                            bank_code: qrResult.bank_code,
+                                                            qr_payload: currentQrPayload
+                                                        }, 
+                                                        userEmail: user.email 
+                                                    })
                                                 });
                                                 const json = await res.json();
                                                 if (json.success) {
                                                     setQrResult(null);
+                                                    setCurrentQrPayload('');
                                                     loadSavedMerchant();
                                                 } else {
                                                     alert(json.error);
@@ -1169,7 +1182,6 @@ export default function AdminPage() {
                                     <thead>
                                         <tr>
                                             <th>Merchant Name</th>
-                                            <th>ID</th>
                                             <th>City</th>
                                             <th>Status</th>
                                             <th>Action</th>
@@ -1179,7 +1191,6 @@ export default function AdminPage() {
                                         {savedMerchants.map(m => (
                                             <tr key={m.id}>
                                                 <td style={{ fontWeight: 500 }}>{m.merchant_name}</td>
-                                                <td style={{ fontSize: '0.85rem' }}>{m.merchant_id}</td>
                                                 <td>{m.merchant_city}</td>
                                                 <td>
                                                     <span className={`status-badge ${m.selected ? 'completed' : 'pending'}`}>

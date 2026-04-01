@@ -121,13 +121,6 @@ export async function POST(request: NextRequest) {
             case 'place_order': {
                 const { userId, items, total, shippingAddress, subtotal, shippingCost, invoiceNumber } = data;
                 
-                // 1. Fetch selected merchant details
-                const { data: merchant } = await adminClient
-                    .from('merchant_data')
-                    .select('*')
-                    .eq('selected', true)
-                    .single();
-
                 const { data: order, error: orderError } = await adminClient.from('orders').insert({
                     user_id: userId,
                     items,
@@ -142,35 +135,24 @@ export async function POST(request: NextRequest) {
                 
                 if (orderError) return NextResponse.json({ error: orderError.message }, { status: 500 });
                 
-                // 2. Generate QR Code if merchant exists
+                // Generate QR Code
                 let qrBase64 = null;
-                if (merchant) {
-                    try {
-                        const qrResponse = await fetch('https://b2u-qr-worker.qr4pos.workers.dev/generate', {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${process.env.QR_WORKER_API_KEY}`,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                amount: total.toFixed(2),
-                                reference_number: invoiceNumber || order.id.toString(), // Use invoiceNumber as reference
-                                merchant_id: merchant.merchant_id,
-                                bank_code: merchant.bank_code,
-                                terminal_id: merchant.terminal_id,
-                                merchant_name: merchant.merchant_name,
-                                merchant_city: merchant.merchant_city,
-                                mcc: merchant.mcc,
-                                currency_code: merchant.currency_code,
-                                country_code: merchant.country_code
-                                // format: 'base64' is now default
-                            })
-                        });
-                        const qrData: any = await qrResponse.json();
-                        qrBase64 = qrData.base64;
-                    } catch (qrErr) {
-                        console.error('QR Generation failed:', qrErr);
-                    }
+                try {
+                    const qrResponse = await fetch('https://b2u-qr-worker.qr4pos.workers.dev/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${process.env.QR_WORKER_API_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            amount: total.toFixed(2),
+                            reference_number: invoiceNumber || order.id.toString(),
+                        })
+                    });
+                    const qrData: any = await qrResponse.json();
+                    qrBase64 = qrData.base64;
+                } catch (qrErr) {
+                    console.error('QR Generation failed:', qrErr);
                 }
 
                 for (const item of items) {
@@ -205,33 +187,74 @@ export async function POST(request: NextRequest) {
             }
 
             case 'save_merchant': {
-                const { merchant_id, bank_code, terminal_id, merchant_name, merchant_city, mcc, currency_code, country_code } = data;
+                const { merchant_name, merchant_city, bank_code, qr_payload } = data;
+                
+                // Insert new merchant as selected
                 const { data: merchant, error } = await adminClient.from('merchant_data').insert({
-                    merchant_id,
-                    bank_code,
-                    terminal_id,
                     merchant_name,
                     merchant_city,
-                    mcc,
-                    currency_code,
-                    country_code
+                    bank_code,
+                    qr_payload,
+                    selected: true
                 }).select().single();
                 
                 if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+                // Sync with external worker
+                try {
+                    await fetch('https://b2u-qr-worker.qr4pos.workers.dev/parse', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${process.env.QR_WORKER_API_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ payload: qr_payload })
+                    });
+                } catch (parseErr) {
+                    console.error('External parse failed during save:', parseErr);
+                    // We don't return error here because the DB save was successful
+                }
+
                 return NextResponse.json({ success: true, data: merchant });
             }
 
             case 'select_merchant': {
                 const { id } = data;
-                // Deselect all
-                const { error: deselectError } = await adminClient
+
+                // 1. Fetch merchant to get payload
+                const { data: merchantData, error: fetchError } = await adminClient
                     .from('merchant_data')
-                    .update({ selected: false })
-                    .neq('id', '00000000-0000-0000-0000-000000000000');
+                    .select('qr_payload')
+                    .eq('id', id)
+                    .single();
 
-                if (deselectError) return NextResponse.json({ error: deselectError.message }, { status: 500 });
+                if (fetchError || !merchantData?.qr_payload) {
+                    return NextResponse.json({ error: 'Merchant payload not found' }, { status: 404 });
+                }
 
-                // Select the new one
+                // 2. Call external parse endpoint to set active state
+                try {
+                    const parseResponse = await fetch('https://b2u-qr-worker.qr4pos.workers.dev/parse', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${process.env.QR_WORKER_API_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ payload: merchantData.qr_payload })
+                    });
+                    
+                    const parseResult: any = await parseResponse.json();
+                    if (parseResult.status !== 'success' && parseResult.status !== 'ok') {
+                        return NextResponse.json({ 
+                            error: `External worker failed to activate merchant: ${parseResult.message || 'Unknown error'}` 
+                        }, { status: 400 });
+                    }
+                } catch (parseErr) {
+                    console.error('External parse failed:', parseErr);
+                    return NextResponse.json({ error: 'Failed to notify worker of merchant switch' }, { status: 500 });
+                }
+
+                // 3. Select the new one (DB trigger handles deselecting others)
                 const { error: selectError } = await adminClient
                     .from('merchant_data')
                     .update({ selected: true })

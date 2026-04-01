@@ -9,6 +9,14 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
     try {
+        const authHeader = request.headers.get('Authorization');
+        const apiKey = authHeader ? authHeader.split(' ')[1] : null;
+
+        if (!apiKey || apiKey !== process.env.QR_WORKER_API_KEY) {
+            console.warn('Unauthorized payment verification attempt');
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const body = await request.json();
         const { status, reference, amount } = body;
 
