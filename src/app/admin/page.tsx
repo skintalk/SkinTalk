@@ -86,7 +86,18 @@ interface Order {
     user_id: string;
     items: { product_id: string }[];
     total: number;
+    subtotal?: number;
+    shipping_cost?: number;
+    shipping_address?: {
+        fullName: string;
+        street: string;
+        city: string;
+        state: string;
+        zipCode: string;
+        phone: string;
+    };
     status: string;
+    invoice_number?: string;
     created_at: string;
     items_detail?: { name: string; price: number; image: string }[];
     customer_email?: string;
@@ -120,6 +131,7 @@ export default function AdminPage() {
     const [users, setUsers] = useState<UserProfile[]>([]);
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [stats, setStats] = useState({ totalRevenue: 0, totalOrders: 0, totalUsers: 0, totalProducts: 0 });
+    const [openOrderStatusId, setOpenOrderStatusId] = useState<string | null>(null);
     
     const [categories, setCategories] = useState<Category[]>([]);
     const [newProductName, setNewProductName] = useState('');
@@ -489,6 +501,7 @@ export default function AdminPage() {
         setNewProductImageName('');
         setEditingProduct(null);
         setIsCategoryDropdownOpen(false);
+        setIsAddProductExpanded(false);
     };
 
     const handleEditProduct = (product: Product) => {
@@ -938,6 +951,7 @@ export default function AdminPage() {
                                     <tr>
                                         <th>Img</th>
                                         <th>Name</th>
+                                        <th>Item Code</th>
                                         <th>Category</th>
                                         <th>Price</th>
                                         <th>Stock</th>
@@ -949,12 +963,13 @@ export default function AdminPage() {
                                         <tr key={product.id}>
                                             <td>{product.image && <img src={product.image} alt={product.name} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />}</td>
                                             <td style={{ fontWeight: 500 }}>{product.name}</td>
+                                            <td style={{ color: '#666', fontSize: '0.9rem' }}>{product.item_code || '-'}</td>
                                             <td>{product.category}</td>
                                             <td>LKR {product.price.toFixed(2)}</td>
                                             <td>{product.quantity}</td>
                                             <td>
                                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                    <button className="admin-btn secondary" style={{ padding: '0.4rem' }} onClick={() => { setEditingProduct(product); setIsAddProductExpanded(true); }}>Edit</button>
+                                                    <button className="admin-btn secondary" style={{ padding: '0.4rem' }} onClick={() => handleEditProduct(product)}>Edit</button>
                                                     <button className="admin-btn secondary" style={{ padding: '0.4rem', color: '#d9534f' }} onClick={() => handleDeleteProduct(product.id)}><FontAwesomeIcon icon={faTrash} /></button>
                                                 </div>
                                             </td>
@@ -1028,30 +1043,60 @@ export default function AdminPage() {
                             <table className="admin-table">
                                 <thead>
                                     <tr>
-                                        <th>Customer</th>
-                                        <th>Items</th>
-                                        <th>Total</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                        <th>Actions</th>
+                                        <th style={{ width: '15%' }}>Customer</th>
+                                        <th style={{ width: '25%' }}>Shipping Details</th>
+                                        <th style={{ width: '20%' }}>Items</th>
+                                        <th style={{ width: '10%' }}>Total</th>
+                                        <th style={{ width: '10%' }}>Status</th>
+                                        <th style={{ width: '10%' }}>Date</th>
+                                        <th style={{ width: '10%' }}>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {orders.map(order => (
                                         <tr key={order.id}>
                                             <td>{order.customer_email}</td>
+                                            <td>
+                                                {order.shipping_address ? (
+                                                    <div style={{ fontSize: '0.82rem', lineHeight: '1.5', wordBreak: 'break-word' }}>
+                                                        <span style={{ fontWeight: 600 }}>{order.shipping_address.fullName}</span>, 
+                                                        <span> {order.shipping_address.street}</span>, 
+                                                        <span> {order.shipping_address.city}{order.shipping_address.state ? `, ${order.shipping_address.state}` : ''}</span>. 
+                                                        <span style={{ fontWeight: 500, color: 'var(--accent)', marginLeft: '4px' }}>{order.shipping_address.phone}</span>
+                                                    </div>
+                                                ) : <span style={{ color: '#999' }}>No address</span>}
+                                            </td>
                                             <td>{order.items_detail?.map((item, i) => <div key={i}>{item.name}</div>)}</td>
                                             <td>LKR {order.total.toFixed(2)}</td>
                                             <td><span className={`status-badge ${order.status}`}>{order.status}</span></td>
                                             <td>{new Date(order.created_at).toLocaleDateString()}</td>
                                             <td>
-                                                <select value={order.status} onChange={(e) => handleStatusChange(order.id, e.target.value)} style={{ padding: '4px' }}>
-                                                    <option value="pending">Pending</option>
-                                                    <option value="processing">Processing</option>
-                                                    <option value="shipped">Shipped</option>
-                                                    <option value="delivered">Delivered</option>
-                                                    <option value="cancelled">Cancelled</option>
-                                                </select>
+                                                <div className="custom-select-wrapper" style={{ minWidth: '110px' }}>
+                                                    <div 
+                                                        className={`admin-form-custom-select-trigger ${openOrderStatusId === order.id ? 'open' : ''}`}
+                                                        style={{ padding: '0.4rem 1.8rem 0.4rem 0.6rem', fontSize: '0.8rem' }}
+                                                        onClick={() => setOpenOrderStatusId(openOrderStatusId === order.id ? null : order.id)}
+                                                    >
+                                                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                                    </div>
+                                                    {openOrderStatusId === order.id && (
+                                                        <div className="custom-select-dropdown" style={{ minWidth: '110px' }}>
+                                                            {['pending', 'processing', 'shipped', 'delivered', 'cancelled'].map(status => (
+                                                                <div 
+                                                                    key={status}
+                                                                    className="custom-select-option"
+                                                                    style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem' }}
+                                                                    onClick={() => {
+                                                                        handleStatusChange(order.id, status);
+                                                                        setOpenOrderStatusId(null);
+                                                                    }}
+                                                                >
+                                                                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
