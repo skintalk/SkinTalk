@@ -89,6 +89,7 @@ export default function Home() {
     const [uploading, setUploading] = useState(false);
     const [checkoutLoading, setCheckoutLoading] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [navigating, setNavigating] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -449,7 +450,10 @@ export default function Home() {
                                             alt={product.name} 
                                             fill
                                             style={{ objectFit: 'cover', cursor: 'pointer' }}
-                                            onClick={() => router.push(`/products/${product.slug || product.id}`)}
+                                            onClick={() => {
+                                                setNavigating(true);
+                                                router.push(`/products/${product.slug || product.id}`);
+                                            }}
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                         />
                                         {(!product.quantity || product.quantity <= 0) && (
@@ -479,7 +483,10 @@ export default function Home() {
                                         )}
                                     </div>
                                     <div className="product-info" style={{ cursor: 'pointer', textAlign: 'center' }}>
-                                        <div onClick={() => router.push(`/products/${product.slug || product.id}`)}>
+                                        <div onClick={() => {
+                                            setNavigating(true);
+                                            router.push(`/products/${product.slug || product.id}`);
+                                        }}>
                                             <h3 style={{ margin: '0 auto 0.5rem' }}>{product.name}</h3>
                                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                                                 <p className="product-price">LKR {product.price.toFixed(2)}</p>
@@ -640,6 +647,40 @@ export default function Home() {
                             <button onClick={() => { setAuthMode(authMode === 'login' ? 'signup' : 'login'); setAuthError(''); }} style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', textDecoration: 'underline' }}>{authMode === 'login' ? 'Sign Up' : 'Sign In'}</button>
                         </p>
                     </div>
+                </div>
+            )}
+            {navigating && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    background: 'rgba(255, 255, 255, 0.7)',
+                    backdropFilter: 'blur(4px)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10000,
+                    fontFamily: 'var(--font-serif)'
+                }}>
+                    <div className="nav-spinner" style={{
+                        width: '40px',
+                        height: '40px',
+                        border: '3px solid rgba(255, 105, 180, 0.1)',
+                        borderTop: '3px solid var(--accent-pink, #ff69b4)',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite',
+                        marginBottom: '1rem'
+                    }}></div>
+                    <p style={{ color: '#333', letterSpacing: '0.1em', fontSize: '0.9rem' }}>LOADING PRODUCT...</p>
+                    <style>{`
+                        @keyframes spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    `}</style>
                 </div>
             )}
         </>
