@@ -131,10 +131,20 @@ export default function Home() {
         try {
             const supabase = getSupabase();
             if (authMode === 'login') {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                const { data: signInData, error } = await supabase.auth.signInWithPassword({ email, password });
                 if (error) throw error;
+                
+                // Ensure profile exists on login too (recovery/sync)
+                if (signInData.user) {
+                    await supabase.from('user_profiles').upsert({
+                        id: signInData.user.id,
+                        email: email,
+                        name: signInData.user.user_metadata?.name || '',
+                        contact_number: signInData.user.user_metadata?.contact_number || ''
+                    }, { onConflict: 'id' }).select();
+                }
             } else {
-                const { error } = await supabase.auth.signUp({ 
+                const { data: signUpData, error } = await supabase.auth.signUp({ 
                     email, 
                     password,
                     options: {
@@ -145,6 +155,17 @@ export default function Home() {
                     }
                 });
                 if (error) throw error;
+                
+                // Sync to user_profiles table
+                if (signUpData.user) {
+                    await supabase.from('user_profiles').upsert({
+                        id: signUpData.user.id,
+                        email: email,
+                        name: name,
+                        contact_number: phoneNumber,
+                        created_at: new Date().toISOString()
+                    });
+                }
             }
             setAuthModalOpen(false);
             setEmail('');

@@ -13,7 +13,7 @@ config.autoAddCss = false;
 library.add(faSearch, faShoppingBag, faTimes, faMagic, faBars, faWhatsapp, faStar, faCreditCard, faTruck, faUndo, faShieldAlt);
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://skintalk.lk'),
+  metadataBase: new URL('https://www.skintalks.lk'),
   title: {
     default: "SkinTalk | Premium Clean Skincare Sri Lanka",
     template: "%s | SkinTalk",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://skintalk.lk",
+    url: "https://www.skintalks.lk",
     siteName: "SkinTalk",
     title: "SkinTalk | Premium Clean Skincare Sri Lanka",
     description: "Experience the perfect blend of minimalist design and pure ingredients. Discover your glow with SkinTalk.",
@@ -60,8 +60,8 @@ export default function RootLayout({
     "@type": "Organization",
     "name": "SkinTalk",
     "description": "Premium Clean Skincare - Experience the perfect blend of minimalist design and pure ingredients.",
-    "url": "https://skintalk.lk",
-    "logo": "https://skintalk.lk/logo.png",
+    "url": "https://www.skintalks.lk",
+    "logo": "https://www.skintalks.lk/logo.png",
     "sameAs": [
       "https://instagram.com/skintalk",
       "https://facebook.com/skintalk"

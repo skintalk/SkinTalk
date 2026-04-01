@@ -128,10 +128,9 @@ export default async function ProductPage({ params }: Props) {
     redirect(`/products/${product.slug}`);
   }
 
-  // Parallelize remaining fetches
-  const [relatedProducts, reviews, categories] = await Promise.all([
+  // Parallelize remaining fetches (Reviews are now handled lazily on the client)
+  const [relatedProducts, categories] = await Promise.all([
     getRelatedProducts(product.category, product.id),
-    getReviews(product.id),
     getCategories()
   ]);
 
@@ -153,11 +152,7 @@ export default async function ProductPage({ params }: Props) {
       price: product.price,
       availability: product.quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
     },
-    aggregateRating: reviews.length > 0 ? {
-        '@type': 'AggregateRating',
-        ratingValue: reviews.reduce((acc: number, r: any) => acc + r.rating, 0) / reviews.length,
-        reviewCount: reviews.length,
-    } : undefined,
+    aggregateRating: undefined, // Handled on client for better performance
   };
 
   return (
@@ -169,7 +164,6 @@ export default async function ProductPage({ params }: Props) {
       <ProductDetailClient 
         initialProduct={product} 
         initialRelatedProducts={relatedProducts}
-        initialReviews={reviews}
         serverCategories={categories}
       />
     </>

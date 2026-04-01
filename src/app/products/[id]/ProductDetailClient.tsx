@@ -65,12 +65,10 @@ function FadeIn({ children, delay = 0, className = '' }: { children: React.React
 export default function ProductDetailClient({ 
     initialProduct, 
     initialRelatedProducts, 
-    initialReviews,
     serverCategories
 }: { 
     initialProduct: Product; 
     initialRelatedProducts: Product[]; 
-    initialReviews: Review[];
     serverCategories?: Category[];
 }) {
     const { id } = useParams();
@@ -101,15 +99,12 @@ export default function ProductDetailClient({
     const [mounted, setMounted] = useState(false);
 
     // Review States
-    const [reviews, setReviews] = useState<Review[]>(initialReviews);
+    const [reviews, setReviews] = useState<Review[]>([]);
     const [newRating, setNewRating] = useState(5);
     const [newComment, setNewComment] = useState('');
     const [submittingReview, setSubmittingReview] = useState(false);
-    const [averageRating, setAverageRating] = useState(() => {
-        if (initialReviews.length === 0) return 5;
-        const avg = initialReviews.reduce((acc, r) => acc + r.rating, 0) / initialReviews.length;
-        return Math.round(avg * 10) / 10;
-    });
+    const [reviewsLoading, setReviewsLoading] = useState(true);
+    const [averageRating, setAverageRating] = useState(0);
     
     // Social Proof State
     const [buyersToday, setBuyersToday] = useState(0);
@@ -180,16 +175,15 @@ export default function ProductDetailClient({
     }, []);
 
     useEffect(() => {
+        if (productId) {
+            loadReviews(); // Load reviews for the current product
+        }
+    }, [productId]);
+
+    useEffect(() => {
         setProduct(initialProduct);
         setRelatedProducts(initialRelatedProducts);
-        setReviews(initialReviews);
-        if (initialReviews.length > 0) {
-            const avg = initialReviews.reduce((acc, r) => acc + r.rating, 0) / initialReviews.length;
-            setAverageRating(Math.round(avg * 10) / 10);
-        } else {
-            setAverageRating(5);
-        }
-    }, [initialProduct, initialRelatedProducts, initialReviews]);
+    }, [initialProduct, initialRelatedProducts]);
 
     useEffect(() => {
         if (activeSection && accordionRefs.current[activeSection]) {
@@ -225,20 +219,43 @@ export default function ProductDetailClient({
     };
 
     const loadReviews = async () => {
+        if (!productId) return;
+        setReviewsLoading(true);
         const supabase = getSupabase();
-        const { data } = await supabase
+        const { data, error } = await supabase
             .from('product_reviews')
-            .select('*, user_profiles(name)')
+            .select(`
+                id,
+                product_id,
+                user_id,
+                rating,
+                comment,
+                created_at,
+                user_profiles (
+                    name
+                )
+            `)
             .eq('product_id', productId)
             .order('created_at', { ascending: false });
         
+        if (error) {
+            console.error('Error loading reviews for product:', productId, JSON.stringify(error, null, 2));
+        }
+
         if (data) {
-            setReviews(data);
-            if (data.length > 0) {
-                const avg = data.reduce((acc, r) => acc + r.rating, 0) / data.length;
+            const formattedReviews = data.map((r: any) => ({
+                ...r,
+                user_profiles: Array.isArray(r.user_profiles) ? r.user_profiles[0] : r.user_profiles
+            }));
+            setReviews(formattedReviews);
+            if (formattedReviews.length > 0) {
+                const avg = formattedReviews.reduce((acc: number, r: any) => acc + r.rating, 0) / formattedReviews.length;
                 setAverageRating(Math.round(avg * 10) / 10);
+            } else {
+                setAverageRating(0);
             }
         }
+        setReviewsLoading(false);
     };
 
     const submitReview = async () => {
@@ -262,7 +279,12 @@ export default function ProductDetailClient({
         if (!error) {
             setNewComment('');
             setNewRating(5);
-            loadReviews();
+            
+            // Add feedback
+            alert('Thank you for your review! It has been posted successfully.');
+            
+            // Refresh reviews to show the new one
+            await loadReviews();
         } else {
             alert('Error submitting review: ' + error.message);
         }
@@ -335,14 +357,35 @@ export default function ProductDetailClient({
         try {
             const supabase = getSupabase();
             if (authMode === 'login') {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                const { data: signInData, error } = await supabase.auth.signInWithPassword({ email, password });
                 if (error) throw error;
+                
+                // Sync profile on login
+                if (signInData.user) {
+                    await supabase.from('user_profiles').upsert({
+                        id: signInData.user.id,
+                        email: email,
+                        name: signInData.user.user_metadata?.name || '',
+                        contact_number: signInData.user.user_metadata?.contact_number || '',
+                    }, { onConflict: 'id' }).select();
+                }
             } else {
-                const { error } = await supabase.auth.signUp({ 
+                const { data: signUpData, error } = await supabase.auth.signUp({ 
                     email, password,
                     options: { data: { name, contact_number: phoneNumber } }
                 });
                 if (error) throw error;
+                
+                // Sync to user_profiles table
+                if (signUpData.user) {
+                    await supabase.from('user_profiles').upsert({
+                        id: signUpData.user.id,
+                        email: email,
+                        name: name,
+                        contact_number: phoneNumber,
+                        created_at: new Date().toISOString()
+                    });
+                }
             }
             setAuthModalOpen(false);
         } catch (err: any) {
@@ -560,11 +603,13 @@ export default function ProductDetailClient({
                                                 <FontAwesomeIcon 
                                                     key={star} 
                                                     icon={faStar} 
-                                                    style={{ color: star <= Math.round(averageRating) ? '#FFD700' : '#ddd' }} 
+                                                    style={{ color: star <= Math.round(mounted ? averageRating : 0) ? '#FFD700' : '#ddd' }} 
                                                 />
                                             ))}
                                         </div>
-                                        <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: '400' }}>({reviews.length} {reviews.length === 1 ? 'Review' : 'Reviews'})</span>
+                                        <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: '400' }}>
+                                            {!mounted || reviewsLoading ? '(...) ' : `(${reviews.length} ${reviews.length === 1 ? 'Review' : 'Reviews'})`}
+                                        </span>
                                     </div>
                                 </div>
 
@@ -706,10 +751,10 @@ export default function ProductDetailClient({
                                 <div className="reviews-summary">
                                     <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem' }}>Customer Reviews</h3>
                                     <div style={{ textAlign: 'right' }}>
-                                        <div style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>{averageRating}</div>
+                                        <div style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>{mounted ? averageRating : 0}</div>
                                         <div style={{ color: '#FFD700' }}>
                                             {[1, 2, 3, 4, 5].map((star) => (
-                                                <FontAwesomeIcon key={star} icon={faStar} style={{ color: star <= Math.round(averageRating) ? '#FFD700' : '#ddd' }} />
+                                                <FontAwesomeIcon key={star} icon={faStar} style={{ color: star <= Math.round(mounted ? averageRating : 0) ? '#FFD700' : '#ddd' }} />
                                             ))}
                                         </div>
                                         <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Based on {reviews.length} reviews</p>
@@ -749,7 +794,13 @@ export default function ProductDetailClient({
 
                                     {/* Reviews List */}
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                                        {reviews.length === 0 ? (
+                                        {!mounted || reviewsLoading ? (
+                                            <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--text-muted)' }}>
+                                                <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.5, repeat: Infinity }}>
+                                                    Loading reviews...
+                                                </motion.div>
+                                            </div>
+                                        ) : reviews.length === 0 ? (
                                             <div style={{ textAlign: 'center', padding: '4rem 0', background: '#fcfcfc', borderRadius: '12px', color: 'var(--text-muted)' }}>
                                                 No reviews yet. Be the first to share your thoughts!
                                             </div>
